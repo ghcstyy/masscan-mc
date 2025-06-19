@@ -34,12 +34,11 @@
  *      the calculated checksum, which should equal the checksum found in the
  * payload
  */
-unsigned checksum_ipv4(unsigned ip_src, unsigned ip_dst, unsigned ip_proto,
-                       size_t payload_length, const void *payload);
+unsigned checksum_ipv4(unsigned ip_src, unsigned ip_dst, unsigned ip_proto, size_t payload_length,
+                       const void* payload);
 
-unsigned checksum_ipv6(const unsigned char *ip_src, const unsigned char *ip_dst,
-                       unsigned ip_proto, size_t payload_length,
-                       const void *payload);
+unsigned checksum_ipv6(const unsigned char* ip_src, const unsigned char* ip_dst, unsigned ip_proto,
+                       size_t payload_length, const void* payload);
 
 /**
  * Simple unit tests.

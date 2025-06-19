@@ -7,9 +7,10 @@
 /**
  * A range of either IP addresses or ports
  */
-struct Range {
-  unsigned begin;
-  unsigned end; /* inclusive, so [n..m] includes both 'n' and 'm' */
+struct Range
+{
+    unsigned begin;
+    unsigned end; /* inclusive, so [n..m] includes both 'n' and 'm' */
 };
 
 /**
@@ -33,8 +34,7 @@ struct Range {
  *      optional (may be NULL).
  *  @return the smaller range, and the number of prefix bits in the range.
  */
-struct Range range_first_cidr(const struct Range range,
-                              unsigned *prefix_length /*out*/);
+struct Range range_first_cidr(const struct Range range, unsigned* prefix_length /*out*/);
 
 /**
  * Test if the range can instead be expressed using a CIDR /prefix.
@@ -48,17 +48,18 @@ struct Range range_first_cidr(const struct Range range,
  *  for printing in that notation. False otherwise, in which case
  *  `prefix_length` is set to 0xFFFFFFFF (an invalid value).
  */
-bool range_is_cidr(const struct Range range, unsigned *prefix_length /*out*/);
+bool range_is_cidr(const struct Range range, unsigned* prefix_length /*out*/);
 
 /**
  * An array of ranges in sorted order
  */
-struct RangeList {
-  struct Range *list;
-  unsigned count;
-  unsigned max;
-  unsigned *picker;
-  unsigned is_sorted : 1;
+struct RangeList
+{
+    struct Range* list;
+    unsigned count;
+    unsigned max;
+    unsigned* picker;
+    unsigned is_sorted : 1;
 };
 
 /**
@@ -72,12 +73,10 @@ struct RangeList {
  * @param end
  *      The last address (inclusive) of the range that'll be added.
  */
-void rangelist_add_range(struct RangeList *task, unsigned begin, unsigned end);
+void rangelist_add_range(struct RangeList* task, unsigned begin, unsigned end);
 
-void rangelist_add_range_tcp(struct RangeList *targets, unsigned begin,
-                             unsigned end);
-void rangelist_add_range_udp(struct RangeList *targets, unsigned begin,
-                             unsigned end);
+void rangelist_add_range_tcp(struct RangeList* targets, unsigned begin, unsigned end);
+void rangelist_add_range_udp(struct RangeList* targets, unsigned begin, unsigned end);
 
 /**
  * Returns 'true' is the indicated port or IP address is in one of the task
@@ -89,7 +88,7 @@ void rangelist_add_range_udp(struct RangeList *targets, unsigned begin,
  * @return
  *      'true' if the ranges contain the item, or 'false' otherwise
  */
-int rangelist_is_contains(const struct RangeList *task, unsigned number);
+int rangelist_is_contains(const struct RangeList* task, unsigned number);
 
 /**
  * Returns 'true' if the indicate range is valid, which is simple the
@@ -111,8 +110,7 @@ int range_is_valid(struct Range range);
  * @param max
  *      The length of the line, in other words, the max value of inout_offset.
  */
-struct Range range_parse_ipv4(const char *line, unsigned *inout_offset,
-                              unsigned max);
+struct Range range_parse_ipv4(const char* line, unsigned* inout_offset, unsigned max);
 
 /**
  * Remove things from the target list. The primary use of this is the
@@ -126,7 +124,7 @@ struct Range range_parse_ipv4(const char *line, unsigned *inout_offset,
  *      should not be scanning, that will override anything we otherwise
  *      try to scan.
  */
-void rangelist_exclude(struct RangeList *targets, struct RangeList *excludes);
+void rangelist_exclude(struct RangeList* targets, struct RangeList* excludes);
 
 /**
  * Counts the total number of IP addresses or ports in the target list. This
@@ -137,7 +135,7 @@ void rangelist_exclude(struct RangeList *targets, struct RangeList *excludes);
  * @return
  *      The total number of address or ports.
  */
-uint64_t rangelist_count(const struct RangeList *targets);
+uint64_t rangelist_count(const struct RangeList* targets);
 
 /**
  * Given an index in a continuous range of [0...count], pick a corresponding
@@ -162,7 +160,7 @@ uint64_t rangelist_count(const struct RangeList *targets);
  * @return
  *      an IP address or port corresponding to this index.
  */
-unsigned rangelist_pick(const struct RangeList *targets, uint64_t i);
+unsigned rangelist_pick(const struct RangeList* targets, uint64_t i);
 
 /**
  * Given a string like "80,8080,20-25,U:161", parse it into a structure
@@ -182,18 +180,18 @@ unsigned rangelist_pick(const struct RangeList *targets, uint64_t i);
  *      the pointer in the string where the parsing ended, so that additional
  *      things can be contained in the string, such as comments
  */
-const char *rangelist_parse_ports(struct RangeList *ports, const char *string,
-                                  unsigned *is_error, unsigned proto_offset);
+const char* rangelist_parse_ports(struct RangeList* ports, const char* string, unsigned* is_error,
+                                  unsigned proto_offset);
 
 /**
  * Remove all the ranges in the range list.
  */
-void rangelist_remove_all(struct RangeList *list);
+void rangelist_remove_all(struct RangeList* list);
 
 /**
  * Merge two range lists
  */
-void rangelist_merge(struct RangeList *list1, const struct RangeList *list2);
+void rangelist_merge(struct RangeList* list1, const struct RangeList* list2);
 
 /**
  * Optimizes the target list, so that when we call "rangelist_pick()"
@@ -201,14 +199,14 @@ void rangelist_merge(struct RangeList *list1, const struct RangeList *list2);
  * a binary-search, though in the future some more efficient
  * algorithm may be chosen.
  */
-void rangelist_optimize(struct RangeList *targets);
+void rangelist_optimize(struct RangeList* targets);
 
 /**
  * Sorts the list of target. We maintain the list of targets in sorted
  * order internally even though we scan the targets in random order
  * externally.
  */
-void rangelist_sort(struct RangeList *targets);
+void rangelist_sort(struct RangeList* targets);
 
 /**
  * Does a regression test of this module

@@ -25,32 +25,34 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
-unsigned rawsock_get_adapter_ip(const char *ifname) {
-  int fd;
-  struct ifreq ifr;
-  struct sockaddr_in *sin;
-  struct sockaddr *sa;
-  int x;
+unsigned rawsock_get_adapter_ip(const char* ifname)
+{
+    int fd;
+    struct ifreq ifr;
+    struct sockaddr_in* sin;
+    struct sockaddr* sa;
+    int x;
 
-  fd = socket(AF_INET, SOCK_DGRAM, 0);
+    fd = socket(AF_INET, SOCK_DGRAM, 0);
 
-  ifr.ifr_addr.sa_family = AF_INET;
-  safe_strcpy(ifr.ifr_name, IFNAMSIZ, ifname);
+    ifr.ifr_addr.sa_family = AF_INET;
+    safe_strcpy(ifr.ifr_name, IFNAMSIZ, ifname);
 
-  x = ioctl(fd, SIOCGIFADDR, &ifr);
-  if (x < 0) {
-    fprintf(stderr, "ERROR:'%s': %s\n", ifname, strerror(errno));
-    // fprintf(stderr, "ERROR:'%s': couldn't discover IP address of network
-    // interface\n", ifname);
+    x = ioctl(fd, SIOCGIFADDR, &ifr);
+    if (x < 0)
+    {
+        fprintf(stderr, "ERROR:'%s': %s\n", ifname, strerror(errno));
+        // fprintf(stderr, "ERROR:'%s': couldn't discover IP address of network
+        // interface\n", ifname);
+        close(fd);
+        return 0;
+    }
+
     close(fd);
-    return 0;
-  }
 
-  close(fd);
-
-  sa = &ifr.ifr_addr;
-  sin = (struct sockaddr_in *)sa;
-  return ntohl(sin->sin_addr.s_addr);
+    sa = &ifr.ifr_addr;
+    sin = (struct sockaddr_in*) sa;
+    return ntohl(sin->sin_addr.s_addr);
 }
 
 /*****************************************************************************
@@ -71,71 +73,80 @@ unsigned rawsock_get_adapter_ip(const char *ifname) {
 #pragma comment(lib, "IPHLPAPI.lib")
 #endif
 
-unsigned rawsock_get_adapter_ip(const char *ifname) {
-  PIP_ADAPTER_INFO pAdapterInfo;
-  PIP_ADAPTER_INFO pAdapter = NULL;
-  DWORD err;
-  ULONG ulOutBufLen = sizeof(IP_ADAPTER_INFO);
-  unsigned result = 0;
+unsigned rawsock_get_adapter_ip(const char* ifname)
+{
+    PIP_ADAPTER_INFO pAdapterInfo;
+    PIP_ADAPTER_INFO pAdapter = NULL;
+    DWORD err;
+    ULONG ulOutBufLen = sizeof(IP_ADAPTER_INFO);
+    unsigned result = 0;
 
-  ifname = rawsock_win_name(ifname);
+    ifname = rawsock_win_name(ifname);
 
-  /*
-   * Allocate a proper sized buffer
-   */
-  pAdapterInfo = malloc(sizeof(IP_ADAPTER_INFO));
-  if (pAdapterInfo == NULL) {
-    fprintf(stderr, "error:malloc(): for GetAdaptersinfo\n");
-    return 0;
-  }
+    /*
+     * Allocate a proper sized buffer
+     */
+    pAdapterInfo = malloc(sizeof(IP_ADAPTER_INFO));
+    if (pAdapterInfo == NULL)
+    {
+        fprintf(stderr, "error:malloc(): for GetAdaptersinfo\n");
+        return 0;
+    }
 
-  /*
-   * Query the adapter info. If the buffer is not big enough, loop around
-   * and try again
-   */
+    /*
+     * Query the adapter info. If the buffer is not big enough, loop around
+     * and try again
+     */
 again:
-  err = GetAdaptersInfo(pAdapterInfo, &ulOutBufLen);
-  if (err == ERROR_BUFFER_OVERFLOW) {
-    free(pAdapterInfo);
-    pAdapterInfo = (IP_ADAPTER_INFO *)malloc(ulOutBufLen);
-    if (pAdapterInfo == NULL) {
-      fprintf(stderr, "error:malloc(): for GetAdaptersinfo\n");
-      return 0;
+    err = GetAdaptersInfo(pAdapterInfo, &ulOutBufLen);
+    if (err == ERROR_BUFFER_OVERFLOW)
+    {
+        free(pAdapterInfo);
+        pAdapterInfo = (IP_ADAPTER_INFO*) malloc(ulOutBufLen);
+        if (pAdapterInfo == NULL)
+        {
+            fprintf(stderr, "error:malloc(): for GetAdaptersinfo\n");
+            return 0;
+        }
+        goto again;
     }
-    goto again;
-  }
-  if (err != NO_ERROR) {
-    fprintf(stderr, "GetAdaptersInfo failed with error: %u\n", (unsigned)err);
-    return 0;
-  }
-
-  /*
-   * loop through all adapters looking for ours
-   */
-  for (pAdapter = pAdapterInfo; pAdapter; pAdapter = pAdapter->Next) {
-    if (rawsock_is_adapter_names_equal(pAdapter->AdapterName, ifname))
-      break;
-  }
-
-  if (pAdapter) {
-    const IP_ADDR_STRING *addr;
-
-    for (addr = &pAdapter->IpAddressList; addr; addr = addr->Next) {
-      unsigned x;
-
-      x = massip_parse_ipv4(addr->IpAddress.String);
-      if (x != 0xFFFFFFFF) {
-        result = x;
-        goto end;
-      }
+    if (err != NO_ERROR)
+    {
+        fprintf(stderr, "GetAdaptersInfo failed with error: %u\n", (unsigned) err);
+        return 0;
     }
-  }
+
+    /*
+     * loop through all adapters looking for ours
+     */
+    for (pAdapter = pAdapterInfo; pAdapter; pAdapter = pAdapter->Next)
+    {
+        if (rawsock_is_adapter_names_equal(pAdapter->AdapterName, ifname))
+            break;
+    }
+
+    if (pAdapter)
+    {
+        const IP_ADDR_STRING* addr;
+
+        for (addr = &pAdapter->IpAddressList; addr; addr = addr->Next)
+        {
+            unsigned x;
+
+            x = massip_parse_ipv4(addr->IpAddress.String);
+            if (x != 0xFFFFFFFF)
+            {
+                result = x;
+                goto end;
+            }
+        }
+    }
 
 end:
-  if (pAdapterInfo)
-    free(pAdapterInfo);
+    if (pAdapterInfo)
+        free(pAdapterInfo);
 
-  return result;
+    return result;
 }
 /*****************************************************************************
  *****************************************************************************/
@@ -154,40 +165,42 @@ end:
 #include <netpacket/packet.h>
 #endif
 
-unsigned rawsock_get_adapter_ip(const char *ifname) {
-  int err;
-  struct ifaddrs *ifap;
-  struct ifaddrs *p;
-  unsigned ip;
+unsigned rawsock_get_adapter_ip(const char* ifname)
+{
+    int err;
+    struct ifaddrs* ifap;
+    struct ifaddrs* p;
+    unsigned ip;
 
-  /* Get the list of all network adapters */
-  err = getifaddrs(&ifap);
-  if (err != 0) {
-    perror("getifaddrs");
-    return 0;
-  }
+    /* Get the list of all network adapters */
+    err = getifaddrs(&ifap);
+    if (err != 0)
+    {
+        perror("getifaddrs");
+        return 0;
+    }
 
-  /* Look through the list until we get our adapter */
-  for (p = ifap; p; p = p->ifa_next) {
-    if (strcmp(ifname, p->ifa_name) == 0 && p->ifa_addr &&
-        p->ifa_addr->sa_family == AF_INET)
-      break;
-  }
-  if (p == NULL)
-    goto error; /* not found */
+    /* Look through the list until we get our adapter */
+    for (p = ifap; p; p = p->ifa_next)
+    {
+        if (strcmp(ifname, p->ifa_name) == 0 && p->ifa_addr && p->ifa_addr->sa_family == AF_INET)
+            break;
+    }
+    if (p == NULL)
+        goto error; /* not found */
 
-  /* Return the address */
-  {
-    struct sockaddr_in *sin = (struct sockaddr_in *)p->ifa_addr;
+    /* Return the address */
+    {
+        struct sockaddr_in* sin = (struct sockaddr_in*) p->ifa_addr;
 
-    ip = ntohl(sin->sin_addr.s_addr);
-  }
+        ip = ntohl(sin->sin_addr.s_addr);
+    }
 
-  freeifaddrs(ifap);
-  return ip;
+    freeifaddrs(ifap);
+    return ip;
 error:
-  freeifaddrs(ifap);
-  return 0;
+    freeifaddrs(ifap);
+    return 0;
 }
 
 #endif

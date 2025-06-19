@@ -24,49 +24,53 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-int rawsock_get_adapter_mac(const char *ifname, unsigned char *mac) {
-  int fd;
-  int x;
-  struct ifreq ifr;
+int rawsock_get_adapter_mac(const char* ifname, unsigned char* mac)
+{
+    int fd;
+    int x;
+    struct ifreq ifr;
 
-  fd = socket(AF_INET, SOCK_STREAM, 0);
-  if (fd < 0) {
-    perror("socket");
-    goto end;
-  }
+    fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (fd < 0)
+    {
+        perror("socket");
+        goto end;
+    }
 
-  safe_strcpy(ifr.ifr_name, IFNAMSIZ, ifname);
-  x = ioctl(fd, SIOCGIFHWADDR, (char *)&ifr);
-  if (x < 0) {
-    perror("ioctl");
-    goto end;
-  }
+    safe_strcpy(ifr.ifr_name, IFNAMSIZ, ifname);
+    x = ioctl(fd, SIOCGIFHWADDR, (char*) &ifr);
+    if (x < 0)
+    {
+        perror("ioctl");
+        goto end;
+    }
 
-  /* Log helpful info about the interface type */
-  switch (ifr.ifr_ifru.ifru_hwaddr.sa_family) {
-  case 1:
-    LOG(1, "if:%s: type=ethernet(1)\n", ifname);
-    break;
-  default:
-    LOG(1, "if:%s: type=0x%04x\n", ifname, ifr.ifr_ifru.ifru_hwaddr.sa_family);
-  }
+    /* Log helpful info about the interface type */
+    switch (ifr.ifr_ifru.ifru_hwaddr.sa_family)
+    {
+        case 1:
+            LOG(1, "if:%s: type=ethernet(1)\n", ifname);
+            break;
+        default:
+            LOG(1, "if:%s: type=0x%04x\n", ifname, ifr.ifr_ifru.ifru_hwaddr.sa_family);
+    }
 
-  memcpy(mac, ifr.ifr_ifru.ifru_hwaddr.sa_data, 6);
+    memcpy(mac, ifr.ifr_ifru.ifru_hwaddr.sa_data, 6);
 
-  /*
-   * [KLUDGE]
-   *  For VPN tunnels with raw IP there isn't a hardware address, so just
-   *  return a fake one instead.
-   */
-  if (memcmp(mac, "\0\0\0\0\0\0", 6) == 0 &&
-      ifr.ifr_ifru.ifru_hwaddr.sa_family == 0xfffe) {
-    LOG(1, "%s: creating fake address\n", ifname);
-    mac[5] = 1;
-  }
+    /*
+     * [KLUDGE]
+     *  For VPN tunnels with raw IP there isn't a hardware address, so just
+     *  return a fake one instead.
+     */
+    if (memcmp(mac, "\0\0\0\0\0\0", 6) == 0 && ifr.ifr_ifru.ifru_hwaddr.sa_family == 0xfffe)
+    {
+        LOG(1, "%s: creating fake address\n", ifname);
+        mac[5] = 1;
+    }
 
 end:
-  close(fd);
-  return 0;
+    close(fd);
+    return 0;
 }
 
 /*****************************************************************************
@@ -86,63 +90,68 @@ end:
 #pragma comment(lib, "IPHLPAPI.lib")
 #endif
 
-int rawsock_get_adapter_mac(const char *ifname, unsigned char *mac) {
-  PIP_ADAPTER_INFO pAdapterInfo;
-  PIP_ADAPTER_INFO pAdapter = NULL;
-  DWORD err;
-  ULONG ulOutBufLen = sizeof(IP_ADAPTER_INFO);
+int rawsock_get_adapter_mac(const char* ifname, unsigned char* mac)
+{
+    PIP_ADAPTER_INFO pAdapterInfo;
+    PIP_ADAPTER_INFO pAdapter = NULL;
+    DWORD err;
+    ULONG ulOutBufLen = sizeof(IP_ADAPTER_INFO);
 
-  ifname = rawsock_win_name(ifname);
+    ifname = rawsock_win_name(ifname);
 
-  /*
-   * Allocate a proper sized buffer
-   */
-  pAdapterInfo = (IP_ADAPTER_INFO *)malloc(sizeof(IP_ADAPTER_INFO));
-  if (pAdapterInfo == NULL) {
-    fprintf(stderr, "Error allocating memory needed to call GetAdaptersinfo\n");
-    return EFAULT;
-  }
-
-  /*
-   * Query the adapter info. If the buffer is not big enough, loop around
-   * and try again
-   */
-again:
-  err = GetAdaptersInfo(pAdapterInfo, &ulOutBufLen);
-  if (err == ERROR_BUFFER_OVERFLOW) {
-    free(pAdapterInfo);
-    pAdapterInfo = (IP_ADAPTER_INFO *)malloc(ulOutBufLen);
-    if (pAdapterInfo == NULL) {
-      fprintf(stderr,
-              "Error allocating memory needed to call GetAdaptersinfo\n");
-      return EFAULT;
+    /*
+     * Allocate a proper sized buffer
+     */
+    pAdapterInfo = (IP_ADAPTER_INFO*) malloc(sizeof(IP_ADAPTER_INFO));
+    if (pAdapterInfo == NULL)
+    {
+        fprintf(stderr, "Error allocating memory needed to call GetAdaptersinfo\n");
+        return EFAULT;
     }
-    goto again;
-  }
-  if (err != NO_ERROR) {
-    fprintf(stderr, "if: GetAdaptersInfo failed with error: %u\n",
-            (unsigned)err);
-    return EFAULT;
-  }
 
-  /*
-   * loop through all adapters looking for ours
-   */
-  for (pAdapter = pAdapterInfo; pAdapter; pAdapter = pAdapter->Next) {
-    if (rawsock_is_adapter_names_equal(pAdapter->AdapterName, ifname))
-      break;
-  }
+    /*
+     * Query the adapter info. If the buffer is not big enough, loop around
+     * and try again
+     */
+again:
+    err = GetAdaptersInfo(pAdapterInfo, &ulOutBufLen);
+    if (err == ERROR_BUFFER_OVERFLOW)
+    {
+        free(pAdapterInfo);
+        pAdapterInfo = (IP_ADAPTER_INFO*) malloc(ulOutBufLen);
+        if (pAdapterInfo == NULL)
+        {
+            fprintf(stderr, "Error allocating memory needed to call GetAdaptersinfo\n");
+            return EFAULT;
+        }
+        goto again;
+    }
+    if (err != NO_ERROR)
+    {
+        fprintf(stderr, "if: GetAdaptersInfo failed with error: %u\n", (unsigned) err);
+        return EFAULT;
+    }
 
-  if (pAdapter) {
-    if (pAdapter->AddressLength != 6)
-      return EFAULT;
-    memcpy(mac, pAdapter->Address, 6);
-  }
+    /*
+     * loop through all adapters looking for ours
+     */
+    for (pAdapter = pAdapterInfo; pAdapter; pAdapter = pAdapter->Next)
+    {
+        if (rawsock_is_adapter_names_equal(pAdapter->AdapterName, ifname))
+            break;
+    }
 
-  if (pAdapterInfo)
-    free(pAdapterInfo);
+    if (pAdapter)
+    {
+        if (pAdapter->AddressLength != 6)
+            return EFAULT;
+        memcpy(mac, pAdapter->Address, 6);
+    }
 
-  return 0;
+    if (pAdapterInfo)
+        free(pAdapterInfo);
+
+    return 0;
 }
 
 /*****************************************************************************
@@ -161,51 +170,55 @@ again:
 #include <netpacket/packet.h>
 #endif
 
-int rawsock_get_adapter_mac(const char *ifname, unsigned char *mac) {
-  int err;
-  struct ifaddrs *ifap;
-  struct ifaddrs *p;
+int rawsock_get_adapter_mac(const char* ifname, unsigned char* mac)
+{
+    int err;
+    struct ifaddrs* ifap;
+    struct ifaddrs* p;
 
-  /* Get the list of all network adapters */
-  err = getifaddrs(&ifap);
-  if (err != 0) {
-    perror("getifaddrs");
-    return 1;
-  }
-
-  /* Look through the list until we get our adapter */
-  for (p = ifap; p; p = p->ifa_next) {
-    if (strcmp(ifname, p->ifa_name) == 0 && p->ifa_addr &&
-        p->ifa_addr->sa_family == AF_LINK)
-      break;
-  }
-  if (p == NULL) {
-    LOG(1, "if:%s: not found\n", ifname);
-    goto error; /* not found */
-  }
-
-  /* Return the address */
-  {
-    size_t len = 6;
-    struct sockaddr_dl *link;
-
-    link = (struct sockaddr_dl *)p->ifa_addr;
-    if (len > link->sdl_alen) {
-      memset(mac, 0, 6);
-      len = link->sdl_alen;
+    /* Get the list of all network adapters */
+    err = getifaddrs(&ifap);
+    if (err != 0)
+    {
+        perror("getifaddrs");
+        return 1;
     }
 
-    LOG(1, "[+] if(%s): family=%u, type=%u, len=%u\n", ifname, link->sdl_family,
-        link->sdl_type, len);
+    /* Look through the list until we get our adapter */
+    for (p = ifap; p; p = p->ifa_next)
+    {
+        if (strcmp(ifname, p->ifa_name) == 0 && p->ifa_addr && p->ifa_addr->sa_family == AF_LINK)
+            break;
+    }
+    if (p == NULL)
+    {
+        LOG(1, "if:%s: not found\n", ifname);
+        goto error; /* not found */
+    }
 
-    memcpy(mac, link->sdl_data + link->sdl_nlen, len);
-  }
+    /* Return the address */
+    {
+        size_t len = 6;
+        struct sockaddr_dl* link;
 
-  freeifaddrs(ifap);
-  return 0;
+        link = (struct sockaddr_dl*) p->ifa_addr;
+        if (len > link->sdl_alen)
+        {
+            memset(mac, 0, 6);
+            len = link->sdl_alen;
+        }
+
+        LOG(1, "[+] if(%s): family=%u, type=%u, len=%u\n", ifname, link->sdl_family, link->sdl_type,
+            len);
+
+        memcpy(mac, link->sdl_data + link->sdl_nlen, len);
+    }
+
+    freeifaddrs(ifap);
+    return 0;
 error:
-  freeifaddrs(ifap);
-  return -1;
+    freeifaddrs(ifap);
+    return -1;
 }
 
 #endif

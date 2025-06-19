@@ -5,20 +5,20 @@
 extern struct ProtocolParserStream banner_ssl;
 extern struct ProtocolParserStream banner_ssl_12;
 
-extern const char *ssl_hello_heartbeat_template;
-extern const char *ssl_hello_ticketbleed_template;
-extern const char *ssl_hello_sslv3_template;
+extern const char* ssl_hello_heartbeat_template;
+extern const char* ssl_hello_ticketbleed_template;
+extern const char* ssl_hello_sslv3_template;
 
 /**
  * Parse the SSL Hello template to find its size
  */
-unsigned ssl_hello_size(const void *templ);
+unsigned ssl_hello_size(const void* templ);
 
 /**
  * Allocate memory and make a copy of the template, so that we can
  * rewrite some fields, such as setting the correct timestamp
  */
-char *ssl_hello(const void *templ);
+char* ssl_hello(const void* templ);
 
 /**
  * Add a cipher-spec.
@@ -26,6 +26,6 @@ char *ssl_hello(const void *templ);
  * bug, appending TLS_FALLBACK_SCSV to the list. It may need to reallocate
  * the template.
  */
-char *ssl_add_cipherspec(void *templ, unsigned cipher_spec, unsigned is_append);
+char* ssl_add_cipherspec(void* templ, unsigned cipher_spec, unsigned is_append);
 
 #endif

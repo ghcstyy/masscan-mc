@@ -4,35 +4,35 @@
 
 /*****************************************************************************
  *****************************************************************************/
-static void set_target(struct TemplatePacket *tmpl, unsigned ip_them,
-                       unsigned port_them, unsigned ip_me, unsigned port_me,
-                       unsigned seqno, unsigned char *px, size_t sizeof_px,
-                       size_t *r_length) {
-  unsigned offset_tcp = tmpl->ipv4.offset_tcp;
-  unsigned offset_ip = tmpl->ipv4.offset_ip;
-  unsigned offset_app = tmpl->ipv4.offset_app;
-  unsigned tmpl_length = tmpl->ipv4.length;
-  unsigned xsum;
+static void set_target(struct TemplatePacket* tmpl, unsigned ip_them, unsigned port_them,
+                       unsigned ip_me, unsigned port_me, unsigned seqno, unsigned char* px,
+                       size_t sizeof_px, size_t* r_length)
+{
+    unsigned offset_tcp = tmpl->ipv4.offset_tcp;
+    unsigned offset_ip = tmpl->ipv4.offset_ip;
+    unsigned offset_app = tmpl->ipv4.offset_app;
+    unsigned tmpl_length = tmpl->ipv4.length;
+    unsigned xsum;
 
-  UNUSEDPARM(r_length);
-  UNUSEDPARM(sizeof_px);
-  UNUSEDPARM(seqno);
-  UNUSEDPARM(ip_me);
-  UNUSEDPARM(ip_them);
+    UNUSEDPARM(r_length);
+    UNUSEDPARM(sizeof_px);
+    UNUSEDPARM(seqno);
+    UNUSEDPARM(ip_me);
+    UNUSEDPARM(ip_them);
 
-  px[offset_tcp + 0] = (unsigned char)(port_me >> 8);
-  px[offset_tcp + 1] = (unsigned char)(port_me & 0xFF);
-  px[offset_tcp + 2] = (unsigned char)(port_them >> 8);
-  px[offset_tcp + 3] = (unsigned char)(port_them & 0xFF);
-  px[offset_tcp + 4] = (unsigned char)((tmpl_length - offset_app + 8) >> 8);
-  px[offset_tcp + 5] = (unsigned char)((tmpl_length - offset_app + 8) & 0xFF);
+    px[offset_tcp + 0] = (unsigned char) (port_me >> 8);
+    px[offset_tcp + 1] = (unsigned char) (port_me & 0xFF);
+    px[offset_tcp + 2] = (unsigned char) (port_them >> 8);
+    px[offset_tcp + 3] = (unsigned char) (port_them & 0xFF);
+    px[offset_tcp + 4] = (unsigned char) ((tmpl_length - offset_app + 8) >> 8);
+    px[offset_tcp + 5] = (unsigned char) ((tmpl_length - offset_app + 8) & 0xFF);
 
-  px[offset_tcp + 6] = (unsigned char)(0);
-  px[offset_tcp + 7] = (unsigned char)(0);
-  xsum = udp_checksum2(px, offset_ip, offset_tcp, tmpl_length - offset_tcp);
-  xsum = ~xsum;
-  px[offset_tcp + 6] = (unsigned char)(xsum >> 8);
-  px[offset_tcp + 7] = (unsigned char)(xsum >> 0);
+    px[offset_tcp + 6] = (unsigned char) (0);
+    px[offset_tcp + 7] = (unsigned char) (0);
+    xsum = udp_checksum2(px, offset_ip, offset_tcp, tmpl_length - offset_tcp);
+    xsum = ~xsum;
+    px[offset_tcp + 6] = (unsigned char) (xsum >> 8);
+    px[offset_tcp + 7] = (unsigned char) (xsum >> 0);
 }
 
 /*****************************************************************************

@@ -25,9 +25,10 @@
  * do not support the `uint128_t` type, but all relevant ones do support
  * the `uint64_t` type.
  */
-struct ipv6address {
-  uint64_t hi;
-  uint64_t lo;
+struct ipv6address
+{
+    uint64_t hi;
+    uint64_t lo;
 };
 typedef struct ipv6address ipv6address;
 typedef struct ipv6address ipv6address_t;
@@ -43,8 +44,9 @@ typedef ipv4address ipv4address_t;
  * addresses, we may as well have a canonical type for MAC addresses,
  * too.
  */
-struct macaddress_t {
-  unsigned char addr[6];
+struct macaddress_t
+{
+    unsigned char addr[6];
 };
 typedef struct macaddress_t macaddress_t;
 
@@ -62,55 +64,65 @@ typedef ipv6address massint128_t;
  * distinguished by a version number. The `version` is an integer
  * with a value of either 4 or 6.
  */
-struct ipaddress {
-  union {
-    unsigned ipv4;
-    ipv6address ipv6;
-  };
-  unsigned char version;
+struct ipaddress
+{
+    union
+    {
+        unsigned ipv4;
+        ipv6address ipv6;
+    };
+    unsigned char version;
 };
 typedef struct ipaddress ipaddress;
 
 /** @return true if the IPv6 address is zero [::] */
-static inline int ipv6address_is_zero(ipv6address_t a) {
-  return a.hi == 0 && a.lo == 0;
+static inline int ipv6address_is_zero(ipv6address_t a)
+{
+    return a.hi == 0 && a.lo == 0;
 }
 #define massint128_is_zero ipv6address_is_zero
 
 /** The IPv6 address [FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF]
  * is invalid */
-static inline int ipv6address_is_invalid(ipv6address_t a) {
-  return a.hi == ~0ULL && a.lo == ~0ULL;
+static inline int ipv6address_is_invalid(ipv6address_t a)
+{
+    return a.hi == ~0ULL && a.lo == ~0ULL;
 }
 
 /** Compare two IPv6 addresses */
-static inline int ipv6address_is_equal(ipv6address_t a, ipv6address_t b) {
-  return a.hi == b.hi && a.lo == b.lo;
+static inline int ipv6address_is_equal(ipv6address_t a, ipv6address_t b)
+{
+    return a.hi == b.hi && a.lo == b.lo;
 }
 
-static inline int ipaddress_is_equal(ipaddress a, ipaddress b) {
-  if (a.version != b.version)
-    return 0;
-  if (a.version == 4) {
-    return a.ipv4 == b.ipv4;
-  } else if (a.version == 6) {
-    return ipv6address_is_equal(a.ipv6, b.ipv6);
-  } else
-    return 0;
+static inline int ipaddress_is_equal(ipaddress a, ipaddress b)
+{
+    if (a.version != b.version)
+        return 0;
+    if (a.version == 4)
+    {
+        return a.ipv4 == b.ipv4;
+    }
+    else if (a.version == 6)
+    {
+        return ipv6address_is_equal(a.ipv6, b.ipv6);
+    }
+    else
+        return 0;
 }
 
 /** Compare two IPv6 addresses, to see which one comes frist. This is used
  * in sorting the addresses
  * @return true if a < b, false otherwise */
-static inline int ipv6address_is_lessthan(ipv6address_t a, ipv6address_t b) {
-  return (a.hi == b.hi) ? (a.lo < b.lo) : (a.hi < b.hi);
+static inline int ipv6address_is_lessthan(ipv6address_t a, ipv6address_t b)
+{
+    return (a.hi == b.hi) ? (a.lo < b.lo) : (a.hi < b.hi);
 }
 
 /**
  * Mask the lower bits of each address and test if the upper bits are equal
  */
-int ipv6address_is_equal_prefixed(ipv6address_t lhs, ipv6address_t rhs,
-                                  unsigned prefix);
+int ipv6address_is_equal_prefixed(ipv6address_t lhs, ipv6address_t rhs, unsigned prefix);
 
 ipv6address_t ipv6address_add_uint64(ipv6address_t lhs, uint64_t rhs);
 ipv6address_t ipv6address_subtract(ipv6address_t lhs, ipv6address_t rhs);
@@ -120,53 +132,55 @@ ipv6address_t ipv6address_add(ipv6address_t lhs, ipv6address_t rhs);
  * Given a typical EXTERNAL representation of an IPv6 address, which is
  * an array of 16 bytes, convert to the canonical INTERNAL address.
  */
-static inline ipv6address ipv6address_from_bytes(const unsigned char *buf) {
-  ipv6address addr;
-  addr.hi = (uint64_t)buf[0] << 56 | (uint64_t)buf[1] << 48 |
-            (uint64_t)buf[2] << 40 | (uint64_t)buf[3] << 32 |
-            (uint64_t)buf[4] << 24 | (uint64_t)buf[5] << 16 |
-            (uint64_t)buf[6] << 8 | (uint64_t)buf[7] << 0;
-  addr.lo = (uint64_t)buf[8] << 56 | (uint64_t)buf[9] << 48 |
-            (uint64_t)buf[10] << 40 | (uint64_t)buf[11] << 32 |
-            (uint64_t)buf[12] << 24 | (uint64_t)buf[13] << 16 |
-            (uint64_t)buf[14] << 8 | (uint64_t)buf[15] << 0;
-  return addr;
+static inline ipv6address ipv6address_from_bytes(const unsigned char* buf)
+{
+    ipv6address addr;
+    addr.hi = (uint64_t) buf[0] << 56 | (uint64_t) buf[1] << 48 | (uint64_t) buf[2] << 40 |
+              (uint64_t) buf[3] << 32 | (uint64_t) buf[4] << 24 | (uint64_t) buf[5] << 16 |
+              (uint64_t) buf[6] << 8 | (uint64_t) buf[7] << 0;
+    addr.lo = (uint64_t) buf[8] << 56 | (uint64_t) buf[9] << 48 | (uint64_t) buf[10] << 40 |
+              (uint64_t) buf[11] << 32 | (uint64_t) buf[12] << 24 | (uint64_t) buf[13] << 16 |
+              (uint64_t) buf[14] << 8 | (uint64_t) buf[15] << 0;
+    return addr;
 }
 
 /**
  * Given a typical EXTERNAL representation of an Ethernet MAC address,
  * which is an array of 6 bytes, convert to the canonical INTERNAL address.
  */
-static inline macaddress_t macaddress_from_bytes(const void *vbuf) {
-  const unsigned char *buf = (const unsigned char *)vbuf;
-  macaddress_t result;
-  result.addr[0] = buf[0];
-  result.addr[1] = buf[1];
-  result.addr[2] = buf[2];
-  result.addr[3] = buf[3];
-  result.addr[4] = buf[4];
-  result.addr[5] = buf[5];
-  return result;
+static inline macaddress_t macaddress_from_bytes(const void* vbuf)
+{
+    const unsigned char* buf = (const unsigned char*) vbuf;
+    macaddress_t result;
+    result.addr[0] = buf[0];
+    result.addr[1] = buf[1];
+    result.addr[2] = buf[2];
+    result.addr[3] = buf[3];
+    result.addr[4] = buf[4];
+    result.addr[5] = buf[5];
+    return result;
 }
 
 /** Test if the Ethernet MAC address is all zeroes */
-static inline int macaddress_is_zero(macaddress_t mac) {
-  return mac.addr[0] == 0 && mac.addr[1] == 0 && mac.addr[2] == 0 &&
-         mac.addr[3] == 0 && mac.addr[4] == 0 && mac.addr[5] == 0;
+static inline int macaddress_is_zero(macaddress_t mac)
+{
+    return mac.addr[0] == 0 && mac.addr[1] == 0 && mac.addr[2] == 0 && mac.addr[3] == 0 &&
+           mac.addr[4] == 0 && mac.addr[5] == 0;
 }
 
 /** Compare two Ethernet MAC addresses to see if they are equal */
-static inline int macaddress_is_equal(macaddress_t lhs, macaddress_t rhs) {
-  return lhs.addr[0] == rhs.addr[0] && lhs.addr[1] == rhs.addr[1] &&
-         lhs.addr[2] == rhs.addr[2] && lhs.addr[3] == rhs.addr[3] &&
-         lhs.addr[4] == rhs.addr[4] && lhs.addr[5] == rhs.addr[5];
+static inline int macaddress_is_equal(macaddress_t lhs, macaddress_t rhs)
+{
+    return lhs.addr[0] == rhs.addr[0] && lhs.addr[1] == rhs.addr[1] && lhs.addr[2] == rhs.addr[2] &&
+           lhs.addr[3] == rhs.addr[3] && lhs.addr[4] == rhs.addr[4] && lhs.addr[5] == rhs.addr[5];
 }
 
 /**
  * Return a buffer with the formatted address
  */
-typedef struct ipaddress_formatted {
-  char string[48];
+typedef struct ipaddress_formatted
+{
+    char string[48];
 } ipaddress_formatted_t;
 
 struct ipaddress_formatted ipv6address_fmt(ipv6address a);

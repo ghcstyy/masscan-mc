@@ -15,41 +15,38 @@ int templ_payloads_selftest(void);
 /**
  * Create this module. Must be matched with the 'destroy()' function on exit
  */
-struct PayloadsUDP *payloads_udp_create(void);
+struct PayloadsUDP* payloads_udp_create(void);
 
-struct PayloadsUDP *payloads_oproto_create(void);
+struct PayloadsUDP* payloads_oproto_create(void);
 
 /**
  * Free the resources of an object created with a matching call to
  * 'payloads_create()'
  */
-void payloads_udp_destroy(struct PayloadsUDP *payloads);
+void payloads_udp_destroy(struct PayloadsUDP* payloads);
 
-void payloads_oproto_destroy(struct PayloadsUDP *payloads);
+void payloads_oproto_destroy(struct PayloadsUDP* payloads);
 
 /**
  * Read payloads from an "nmap-payloads" formatted file. The caller is
  * responsible for opening/closing the file, but should passing the
  * filename so that we can print helpful error messages.
  */
-void payloads_udp_readfile(FILE *fp, const char *filename,
-                           struct PayloadsUDP *payloads);
+void payloads_udp_readfile(FILE* fp, const char* filename, struct PayloadsUDP* payloads);
 
 /**
  * Read payloads from a libpcap formatted file.
  */
-void payloads_read_pcap(const char *filename, struct PayloadsUDP *payloads,
-                        struct PayloadsUDP *oproto_payloads);
+void payloads_read_pcap(const char* filename, struct PayloadsUDP* payloads,
+                        struct PayloadsUDP* oproto_payloads);
 
 /**
  * Called to remove any payloads that aren't be used in the scan. This makes
  * lookups faster when generating packets.
  */
-void payloads_udp_trim(struct PayloadsUDP *payloads,
-                       const struct MassIP *targets);
+void payloads_udp_trim(struct PayloadsUDP* payloads, const struct MassIP* targets);
 
-void payloads_oproto_trim(struct PayloadsUDP *payloads,
-                          const struct MassIP *targets);
+void payloads_oproto_trim(struct PayloadsUDP* payloads, const struct MassIP* targets);
 
 /**
  * The port scanner creates a "cookie" for every packet that it sends, which
@@ -59,8 +56,7 @@ void payloads_oproto_trim(struct PayloadsUDP *payloads,
  * different. For example, SNMP can use a 32-bit transaction ID, whereas DNS
  * can use only a 16-bit transaction ID.
  */
-typedef unsigned (*SET_COOKIE)(unsigned char *px, size_t length,
-                               uint64_t seqno);
+typedef unsigned (*SET_COOKIE)(unsigned char* px, size_t length, uint64_t seqno);
 
 /**
  * Given a UDP port number, return the payload we have that is associated
@@ -82,14 +78,12 @@ typedef unsigned (*SET_COOKIE)(unsigned char *px, size_t length,
  *      The returned function that will set the "cookie" field in the
  *      packet for each transmission
  */
-int payloads_udp_lookup(const struct PayloadsUDP *payloads, unsigned port,
-                        const unsigned char **px, unsigned *length,
-                        unsigned *source_port, uint64_t *xsum,
-                        SET_COOKIE *set_cookie);
+int payloads_udp_lookup(const struct PayloadsUDP* payloads, unsigned port, const unsigned char** px,
+                        unsigned* length, unsigned* source_port, uint64_t* xsum,
+                        SET_COOKIE* set_cookie);
 
-int payloads_oproto_lookup(const struct PayloadsUDP *payloads, unsigned port,
-                           const unsigned char **px, unsigned *length,
-                           unsigned *source_port, uint64_t *xsum,
-                           SET_COOKIE *set_cookie);
+int payloads_oproto_lookup(const struct PayloadsUDP* payloads, unsigned port,
+                           const unsigned char** px, unsigned* length, unsigned* source_port,
+                           uint64_t* xsum, SET_COOKIE* set_cookie);
 
 #endif

@@ -20,31 +20,30 @@
 
 /***************************************************************************
  ***************************************************************************/
-static void versioning_tcp_parse(const struct Banner1 *banner1,
-                                 void *banner1_private,
-                                 struct StreamState *pstate,
-                                 const unsigned char *px, size_t length,
-                                 struct BannerOutput *banout,
-                                 struct stack_handle_t *socket) {
-  unsigned state = pstate->state;
+static void versioning_tcp_parse(const struct Banner1* banner1, void* banner1_private,
+                                 struct StreamState* pstate, const unsigned char* px, size_t length,
+                                 struct BannerOutput* banout, struct stack_handle_t* socket)
+{
+    unsigned state = pstate->state;
 
-  UNUSEDPARM(banner1_private);
-  UNUSEDPARM(banner1);
-  UNUSEDPARM(socket);
-  UNUSEDPARM(px);
-  UNUSEDPARM(length);
-  UNUSEDPARM(banout);
+    UNUSEDPARM(banner1_private);
+    UNUSEDPARM(banner1);
+    UNUSEDPARM(socket);
+    UNUSEDPARM(px);
+    UNUSEDPARM(length);
+    UNUSEDPARM(banout);
 
-  pstate->state = state;
+    pstate->state = state;
 }
 
 /***************************************************************************
  ***************************************************************************/
-static void *versioning_init(struct Banner1 *b) {
-  // b->memcached_responses = smack_create("memcached-responses",
-  // SMACK_CASE_INSENSITIVE);
+static void* versioning_init(struct Banner1* b)
+{
+    // b->memcached_responses = smack_create("memcached-responses",
+    // SMACK_CASE_INSENSITIVE);
 
-  return b->http_fields;
+    return b->http_fields;
 }
 
 /***************************************************************************
@@ -74,7 +73,10 @@ versioning_udp_set_cookie(unsigned char *px, size_t length, uint64_t seqno)
 
 /***************************************************************************
  ***************************************************************************/
-static int versioning_selftest(void) { return 0; }
+static int versioning_selftest(void)
+{
+    return 0;
+}
 
 /***************************************************************************
  ***************************************************************************/

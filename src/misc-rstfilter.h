@@ -33,13 +33,12 @@ struct ResetFilter;
  * @return an instance of this object that should be eventually
  *      cleaned up with 'rstfilter_destroy()'.
  */
-struct ResetFilter *rstfilter_create(unsigned long long seed,
-                                     size_t bucket_count);
+struct ResetFilter* rstfilter_create(unsigned long long seed, size_t bucket_count);
 
 /**
  * Cleans up the object that was created with 'rstfilter_create()'.
  */
-void rstfilter_destroy(struct ResetFilter *rf);
+void rstfilter_destroy(struct ResetFilter* rf);
 
 /**
  * Tests to see if we should ignore the given RST packet. This will
@@ -47,8 +46,8 @@ void rstfilter_destroy(struct ResetFilter *rf);
  * @return 1 if we should filter out the offending packet and ignore it,
  *          or else 0 if we shouldn't ignore it.
  */
-int rstfilter_is_filter(struct ResetFilter *rf, ipaddress src_ip,
-                        unsigned src_port, ipaddress dst_ip, unsigned dst_port);
+int rstfilter_is_filter(struct ResetFilter* rf, ipaddress src_ip, unsigned src_port,
+                        ipaddress dst_ip, unsigned dst_port);
 
 int rstfilter_selftest(void);
 

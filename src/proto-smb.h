@@ -12,6 +12,6 @@ extern struct ProtocolParserStream banner_smb1;
  * machines have faulty SMBv2 implementations. SMBv2, though, is the default
  * negotiation because Win10 disables SMBv1 by default.
  */
-void smb_set_hello_v1(struct ProtocolParserStream *smb);
+void smb_set_hello_v1(struct ProtocolParserStream* smb);
 
 #endif

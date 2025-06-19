@@ -1,0 +1,47 @@
+# .clang-format
+
+BasedOnStyle: Google
+
+# Indentation
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never  # Set to ForIndentation if your team prefers tabs
+
+# Braces
+BreakBeforeBraces: Allman  # Each brace on its own line (e.g., like C# style)
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: false
+
+# Spaces
+SpaceAfterCStyleCast: true
+SpaceBeforeParens: ControlStatements
+
+# Line length
+ColumnLimit: 100  # Soft limit on line length; 0 means no limit
+
+# Includes
+IncludeBlocks: Preserve  # Don't group or reorder includes unless needed
+SortIncludes: false      # Turn on if you want automatic include sorting
+
+# Pointer/reference alignment
+PointerAlignment: Left   # int* ptr instead of int *ptr
+DerivePointerAlignment: false
+
+# C++ specific
+NamespaceIndentation: All
+AlwaysBreakTemplateDeclarations: Yes
+
+# Constructor initializer formatting
+BreakConstructorInitializers: BeforeColon
+
+# Formatting macros
+MacroBlockBegin: "^BEGIN_.*"
+MacroBlockEnd: "^END_.*"
+
+# Custom tweak to make chained method calls more readable
+AlignAfterOpenBracket: Align
+
+# Misc
+ReflowComments: true       # Reformat block comments to fit ColumnLimit
+SortUsingDeclarations: false
+FixNamespaceComments: true

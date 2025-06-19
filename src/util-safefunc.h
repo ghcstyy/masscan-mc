@@ -62,9 +62,9 @@
  * A bounds checking version of strcpy, like `strcpy_s()` on Windows or
  * `strlcpy()` in glibc.
  */
-void safe_strcpy(char *dst, size_t sizeof_dst, const char *src);
-int safe_localtime(struct tm *_tm, const time_t *time);
-int safe_gmtime(struct tm *_tm, const time_t *time);
+void safe_strcpy(char* dst, size_t sizeof_dst, const char* src);
+int safe_localtime(struct tm* _tm, const time_t* time);
+int safe_gmtime(struct tm* _tm, const time_t* time);
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1900)
 /*Visual Studio 2015 and 2017*/
@@ -101,7 +101,7 @@ int safe_gmtime(struct tm *_tm, const time_t *time);
 
 #elif defined(__GNUC__) && (__GNUC__ >= 4)
 #include <inttypes.h>
-int memcasecmp(const void *lhs, const void *rhs, size_t length);
+int memcasecmp(const void* lhs, const void* rhs, size_t length);
 ;
 
 #else

@@ -30,30 +30,30 @@ struct Range6;
  * @return
         0 on success, any other number on failure.
  */
-int massip_parse_file(struct MassIP *massip, const char *filename);
+int massip_parse_file(struct MassIP* massip, const char* filename);
 
-enum RangeParseResult {
-  Bad_Address,
-  Ipv4_Address = 4,
-  Ipv6_Address = 6,
+enum RangeParseResult
+{
+    Bad_Address,
+    Ipv4_Address = 4,
+    Ipv6_Address = 6,
 };
 
 /**
  * Parse the next IPv4/IPv6 range from a string. This is called
  * when parsing strings from the command-line.
  */
-enum RangeParseResult massip_parse_range(const char *line, size_t *inout_offset,
-                                         size_t max, struct Range *ipv4,
-                                         struct Range6 *ipv6);
+enum RangeParseResult massip_parse_range(const char* line, size_t* inout_offset, size_t max,
+                                         struct Range* ipv4, struct Range6* ipv6);
 
 /**
  * Parse a single IPv6 address. This is called when working with
  * the operating system stack, when querying addresses from
  * the local network adapters.
  */
-ipv6address_t massip_parse_ipv6(const char *buf);
+ipv6address_t massip_parse_ipv6(const char* buf);
 
-ipv4address_t massip_parse_ipv4(const char *buf);
+ipv4address_t massip_parse_ipv4(const char* buf);
 
 /**
  * Do a simplistic unit test of the parser.

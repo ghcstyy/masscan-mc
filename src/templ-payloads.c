@@ -30,28 +30,31 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct PayloadUDP_Item {
-  unsigned port;
-  unsigned source_port; /* not used yet */
-  unsigned length;
-  unsigned xsum;
-  unsigned rarity;
-  SET_COOKIE set_cookie;
-  unsigned char buf[1];
+struct PayloadUDP_Item
+{
+    unsigned port;
+    unsigned source_port; /* not used yet */
+    unsigned length;
+    unsigned xsum;
+    unsigned rarity;
+    SET_COOKIE set_cookie;
+    unsigned char buf[1];
 };
-struct PayloadUDP_Default {
-  unsigned port;
-  unsigned source_port;
-  unsigned length;
-  unsigned xsum;
-  SET_COOKIE set_cookie;
-  char *buf;
+struct PayloadUDP_Default
+{
+    unsigned port;
+    unsigned source_port;
+    unsigned length;
+    unsigned xsum;
+    SET_COOKIE set_cookie;
+    char* buf;
 };
 
-struct PayloadsUDP {
-  unsigned count;
-  size_t max;
-  struct PayloadUDP_Item **list;
+struct PayloadsUDP
+{
+    unsigned count;
+    size_t max;
+    struct PayloadUDP_Item** list;
 };
 
 struct PayloadUDP_Default hard_coded_oproto_payloads[] = {
@@ -97,12 +100,12 @@ struct PayloadUDP_Default hard_coded_udp_payloads[] = {
     /* portmapper */
     {
         111, 65536, 40, 0, dns_set_cookie,
-        "\x00\x00\x00\x00" /* xid - first two bytes set by dns_set_cookie() */
-        "\x00\x00\x00\x00" /* RPC opcode = CALL*/
-        "\x00\x00\x00\x02" /* RPC version = 2 */
-        "\x00\x01\x86\xa0" /* RPC program = NFS */
-        "\x00\x00\x00\x02" /* portmapper version = 2 */
-        "\x00\x00\x00\x00" /* portmapper procedure = 0 (NULL, ping) */
+        "\x00\x00\x00\x00"                 /* xid - first two bytes set by dns_set_cookie() */
+        "\x00\x00\x00\x00"                 /* RPC opcode = CALL*/
+        "\x00\x00\x00\x02"                 /* RPC version = 2 */
+        "\x00\x01\x86\xa0"                 /* RPC program = NFS */
+        "\x00\x00\x00\x02"                 /* portmapper version = 2 */
+        "\x00\x00\x00\x00"                 /* portmapper procedure = 0 (NULL, ping) */
         "\x00\x00\x00\x00\x00\x00\x00\x00" /* credentials = none*/
         "\x00\x00\x00\x00\x00\x00\x00\x00" /* verifier = none   */
     },
@@ -162,10 +165,10 @@ struct PayloadUDP_Default hard_coded_udp_payloads[] = {
      "\x30\x1e"
      "\x30\x0d"
      "\x06\x09\x2b\x06\x01\x80\x02\x01\x01\x01\x00" /*sysName*/
-     "\x05\x00" /*^^^^_____IDS LULZ HAH HA HAH*/
+     "\x05\x00"                                     /*^^^^_____IDS LULZ HAH HA HAH*/
      "\x30\x0d"
      "\x06\x09\x2b\x06\x01\x80\x02\x01\x01\x05\x00" /*sysDesc*/
-     "\x05\x00"}, /*^^^^_____IDS LULZ HAH HA HAH*/
+     "\x05\x00"},                                   /*^^^^_____IDS LULZ HAH HA HAH*/
 
     {443, 65536, 115, 0, 0,
      "\x16"                     /* opcode = handshake */
@@ -262,12 +265,12 @@ struct PayloadUDP_Default hard_coded_udp_payloads[] = {
     /* NFS - kludge: use the DNS cookie, setting first 2 bytes instead of 4 */
     {
         2049, 65536, 40, 0, dns_set_cookie,
-        "\x00\x00\x00\x00" /* xid - first two bytes set by dns_set_cookie() */
-        "\x00\x00\x00\x00" /* RPC opcode = CALL*/
-        "\x00\x00\x00\x02" /* RPC version = 2 */
-        "\x00\x01\x86\xa3" /* RPC program = NFS */
-        "\x00\x00\x00\x02" /* NFS version = 2 */
-        "\x00\x00\x00\x00" /* NFS procedure = 0 (NULL, ping) */
+        "\x00\x00\x00\x00"                 /* xid - first two bytes set by dns_set_cookie() */
+        "\x00\x00\x00\x00"                 /* RPC opcode = CALL*/
+        "\x00\x00\x00\x02"                 /* RPC version = 2 */
+        "\x00\x01\x86\xa3"                 /* RPC program = NFS */
+        "\x00\x00\x00\x02"                 /* NFS version = 2 */
+        "\x00\x00\x00\x00"                 /* NFS procedure = 0 (NULL, ping) */
         "\x00\x00\x00\x00\x00\x00\x00\x00" /* credentials = none*/
         "\x00\x00\x00\x00\x00\x00\x00\x00" /* verifier = none   */
     },
@@ -297,20 +300,18 @@ struct PayloadUDP_Default hard_coded_udp_payloads[] = {
 
     /* memcached "stats" request. This looks for memcached systems that can
      * be used for DDoS amplifiers */
-    {11211, 65536, 15, 0, memcached_udp_set_cookie,
-     "\x00\x00\x00\x00\x00\x01\x00\x00stats\r\n"},
+    {11211, 65536, 15, 0, memcached_udp_set_cookie, "\x00\x00\x00\x00\x00\x01\x00\x00stats\r\n"},
 
     // 16464,16465,16470, 16471
-    {16464, 65536, zeroaccess_getL_length, 0, 0, (char *)zeroaccess_getL},
-    {16465, 65536, zeroaccess_getL_length, 0, 0, (char *)zeroaccess_getL},
-    {16470, 65536, zeroaccess_getL_length, 0, 0, (char *)zeroaccess_getL},
-    {16471, 65536, zeroaccess_getL_length, 0, 0, (char *)zeroaccess_getL},
+    {16464, 65536, zeroaccess_getL_length, 0, 0, (char*) zeroaccess_getL},
+    {16465, 65536, zeroaccess_getL_length, 0, 0, (char*) zeroaccess_getL},
+    {16470, 65536, zeroaccess_getL_length, 0, 0, (char*) zeroaccess_getL},
+    {16471, 65536, zeroaccess_getL_length, 0, 0, (char*) zeroaccess_getL},
 
     /* Quake 3 (amplifier)
      * http://blog.alejandronolla.com/2013/06/24/amplification-ddos-attack-with-quake3-servers-an-analysis-1-slash-2/
      */
-    {27960, 65536, 0xFFFFFFFF, 0, 0,
-     "\xFF\xFF\xFF\xFF\x67\x65\x74\x73\x74\x61\x74\x75\x73\x10"},
+    {27960, 65536, 0xFFFFFFFF, 0, 0, "\xFF\xFF\xFF\xFF\x67\x65\x74\x73\x74\x61\x74\x75\x73\x10"},
 
     /* ISAKMP */
     {500, 500, 352, 0, isakmp_set_cookie,
@@ -476,66 +477,69 @@ struct PayloadUDP_Default hard_coded_udp_payloads[] = {
  * add this to the checksum when transmitting instead of recalculating
  * everything.
  ***************************************************************************/
-static unsigned partial_checksum(const unsigned char *px, size_t icmp_length) {
-  uint64_t xsum = 0;
-  unsigned i;
+static unsigned partial_checksum(const unsigned char* px, size_t icmp_length)
+{
+    uint64_t xsum = 0;
+    unsigned i;
 
-  for (i = 0; i < icmp_length; i += 2) {
-    xsum += px[i] << 8 | px[i + 1];
-  }
+    for (i = 0; i < icmp_length; i += 2)
+    {
+        xsum += px[i] << 8 | px[i + 1];
+    }
 
-  xsum -= (icmp_length & 1) *
-          px[i - 1]; /* yea I know going off end of packet is bad so sue me */
-  xsum = (xsum & 0xFFFF) + (xsum >> 16);
-  xsum = (xsum & 0xFFFF) + (xsum >> 16);
-  xsum = (xsum & 0xFFFF) + (xsum >> 16);
+    xsum -= (icmp_length & 1) * px[i - 1]; /* yea I know going off end of packet is bad so sue me */
+    xsum = (xsum & 0xFFFF) + (xsum >> 16);
+    xsum = (xsum & 0xFFFF) + (xsum >> 16);
+    xsum = (xsum & 0xFFFF) + (xsum >> 16);
 
-  return (unsigned)xsum;
+    return (unsigned) xsum;
 }
 
 /***************************************************************************
  * If we have the port, return the best payload for that port.
  ***************************************************************************/
-int payloads_udp_lookup(const struct PayloadsUDP *payloads, unsigned port,
-                        const unsigned char **px, unsigned *length,
-                        unsigned *source_port, uint64_t *xsum,
-                        SET_COOKIE *set_cookie) {
-  unsigned i;
-  if (payloads == 0)
-    return 0;
+int payloads_udp_lookup(const struct PayloadsUDP* payloads, unsigned port, const unsigned char** px,
+                        unsigned* length, unsigned* source_port, uint64_t* xsum,
+                        SET_COOKIE* set_cookie)
+{
+    unsigned i;
+    if (payloads == 0)
+        return 0;
 
-  port &= 0xFFFF;
+    port &= 0xFFFF;
 
-  /* This is just a linear search, done once at startup, to search
-   * through all the payloads for the best match. */
-  for (i = 0; i < payloads->count; i++) {
-    if (payloads->list[i]->port == port) {
-      *px = payloads->list[i]->buf;
-      *length = payloads->list[i]->length;
-      *source_port = payloads->list[i]->source_port;
-      *xsum = payloads->list[i]->xsum;
-      *set_cookie = payloads->list[i]->set_cookie;
-      return 1;
+    /* This is just a linear search, done once at startup, to search
+     * through all the payloads for the best match. */
+    for (i = 0; i < payloads->count; i++)
+    {
+        if (payloads->list[i]->port == port)
+        {
+            *px = payloads->list[i]->buf;
+            *length = payloads->list[i]->length;
+            *source_port = payloads->list[i]->source_port;
+            *xsum = payloads->list[i]->xsum;
+            *set_cookie = payloads->list[i]->set_cookie;
+            return 1;
+        }
     }
-  }
-  return 0;
+    return 0;
 }
 
 /***************************************************************************
  * cleanup on program shutdown
  ***************************************************************************/
-void payloads_udp_destroy(struct PayloadsUDP *payloads) {
-  unsigned i;
-  if (payloads == NULL)
-    return;
+void payloads_udp_destroy(struct PayloadsUDP* payloads)
+{
+    unsigned i;
+    if (payloads == NULL)
+        return;
 
-  for (i = 0; i < payloads->count; i++)
-    free(payloads->list[i]);
+    for (i = 0; i < payloads->count; i++) free(payloads->list[i]);
 
-  if (payloads->list)
-    free(payloads->list);
+    if (payloads->list)
+        free(payloads->list);
 
-  free(payloads);
+    free(payloads);
 }
 
 /***************************************************************************
@@ -544,126 +548,136 @@ void payloads_udp_destroy(struct PayloadsUDP *payloads) {
  * function to remove the ones we won't be using. This makes lookups
  * faster, ideally looking up only zero or one rather than twenty.
  ***************************************************************************/
-void payloads_udp_trim(struct PayloadsUDP *payloads,
-                       const struct MassIP *targets) {
-  unsigned i;
-  struct PayloadUDP_Item **list2;
-  unsigned count2 = 0;
+void payloads_udp_trim(struct PayloadsUDP* payloads, const struct MassIP* targets)
+{
+    unsigned i;
+    struct PayloadUDP_Item** list2;
+    unsigned count2 = 0;
 
-  /* Create a new list */
-  list2 = REALLOCARRAY(0, payloads->max, sizeof(list2[0]));
+    /* Create a new list */
+    list2 = REALLOCARRAY(0, payloads->max, sizeof(list2[0]));
 
-  /* Add to the new list any used ports */
-  for (i = 0; i < payloads->count; i++) {
-    unsigned found;
+    /* Add to the new list any used ports */
+    for (i = 0; i < payloads->count; i++)
+    {
+        unsigned found;
 
-    found = massip_has_port(targets, payloads->list[i]->port + Templ_UDP);
-    if (found) {
-      list2[count2++] = payloads->list[i];
-    } else {
-      free(payloads->list[i]);
+        found = massip_has_port(targets, payloads->list[i]->port + Templ_UDP);
+        if (found)
+        {
+            list2[count2++] = payloads->list[i];
+        }
+        else
+        {
+            free(payloads->list[i]);
+        }
+        // payloads->list[i] = 0;
     }
-    // payloads->list[i] = 0;
-  }
 
-  /* Replace the old list */
-  free(payloads->list);
-  payloads->list = list2;
-  payloads->count = count2;
+    /* Replace the old list */
+    free(payloads->list);
+    payloads->list = list2;
+    payloads->count = count2;
 }
 
-void payloads_oproto_trim(struct PayloadsUDP *payloads,
-                          const struct MassIP *targets) {
-  unsigned i;
-  struct PayloadUDP_Item **list2;
-  unsigned count2 = 0;
+void payloads_oproto_trim(struct PayloadsUDP* payloads, const struct MassIP* targets)
+{
+    unsigned i;
+    struct PayloadUDP_Item** list2;
+    unsigned count2 = 0;
 
-  /* Create a new list */
-  list2 = REALLOCARRAY(0, payloads->max, sizeof(list2[0]));
+    /* Create a new list */
+    list2 = REALLOCARRAY(0, payloads->max, sizeof(list2[0]));
 
-  /* Add to the new list any used ports */
-  for (i = 0; i < payloads->count; i++) {
-    unsigned found;
+    /* Add to the new list any used ports */
+    for (i = 0; i < payloads->count; i++)
+    {
+        unsigned found;
 
-    found =
-        massip_has_port(targets, payloads->list[i]->port + Templ_Oproto_first);
-    if (found) {
-      list2[count2++] = payloads->list[i];
-    } else {
-      free(payloads->list[i]);
+        found = massip_has_port(targets, payloads->list[i]->port + Templ_Oproto_first);
+        if (found)
+        {
+            list2[count2++] = payloads->list[i];
+        }
+        else
+        {
+            free(payloads->list[i]);
+        }
     }
-  }
 
-  /* Replace the old list */
-  free(payloads->list);
-  payloads->list = list2;
-  payloads->count = count2;
+    /* Replace the old list */
+    free(payloads->list);
+    payloads->list = list2;
+    payloads->count = count2;
 }
 
 /***************************************************************************
  * Adds a payloads template for the indicated datagram protocol, which
  * is UDP or Oproto ("other IP protocol").
  ***************************************************************************/
-static unsigned payloads_datagram_add(struct PayloadsUDP *payloads,
-                                      const unsigned char *buf, size_t length,
-                                      struct RangeList *ports,
-                                      unsigned source_port,
-                                      SET_COOKIE set_cookie) {
-  unsigned count = 1;
-  struct PayloadUDP_Item *p;
-  uint64_t port_count = rangelist_count(ports);
-  uint64_t i;
+static unsigned payloads_datagram_add(struct PayloadsUDP* payloads, const unsigned char* buf,
+                                      size_t length, struct RangeList* ports, unsigned source_port,
+                                      SET_COOKIE set_cookie)
+{
+    unsigned count = 1;
+    struct PayloadUDP_Item* p;
+    uint64_t port_count = rangelist_count(ports);
+    uint64_t i;
 
-  for (i = 0; i < port_count; i++) {
-    /* grow the list if we need to */
-    if (payloads->count + 1 > payloads->max) {
-      size_t new_max = payloads->max * 2 + 1;
-      payloads->list =
-          REALLOCARRAY(payloads->list, new_max, sizeof(payloads->list[0]));
-      payloads->max = new_max;
-    }
-
-    /* allocate space for this record */
-    p = MALLOC(sizeof(p[0]) + length);
-    p->port = rangelist_pick(ports, i);
-    p->source_port = source_port;
-    p->length = (unsigned)length;
-    memcpy(p->buf, buf, length);
-    p->xsum = partial_checksum(buf, length);
-    p->set_cookie = set_cookie;
-
-    /* insert in sorted order */
+    for (i = 0; i < port_count; i++)
     {
-      unsigned j;
+        /* grow the list if we need to */
+        if (payloads->count + 1 > payloads->max)
+        {
+            size_t new_max = payloads->max * 2 + 1;
+            payloads->list = REALLOCARRAY(payloads->list, new_max, sizeof(payloads->list[0]));
+            payloads->max = new_max;
+        }
 
-      for (j = 0; j < payloads->count; j++) {
-        if (p->port <= payloads->list[j]->port)
-          break;
-      }
+        /* allocate space for this record */
+        p = MALLOC(sizeof(p[0]) + length);
+        p->port = rangelist_pick(ports, i);
+        p->source_port = source_port;
+        p->length = (unsigned) length;
+        memcpy(p->buf, buf, length);
+        p->xsum = partial_checksum(buf, length);
+        p->set_cookie = set_cookie;
 
-      if (j < payloads->count) {
-        if (p->port == payloads->list[j]->port) {
-          free(payloads->list[j]);
-          count = 0; /* don't increment count */
-        } else
-          memmove(payloads->list + j + 1, payloads->list + j,
-                  (payloads->count - j) * sizeof(payloads->list[0]));
-      }
-      payloads->list[j] = p;
+        /* insert in sorted order */
+        {
+            unsigned j;
 
-      payloads->count += count;
-      count = 1;
+            for (j = 0; j < payloads->count; j++)
+            {
+                if (p->port <= payloads->list[j]->port)
+                    break;
+            }
+
+            if (j < payloads->count)
+            {
+                if (p->port == payloads->list[j]->port)
+                {
+                    free(payloads->list[j]);
+                    count = 0; /* don't increment count */
+                }
+                else
+                    memmove(payloads->list + j + 1, payloads->list + j,
+                            (payloads->count - j) * sizeof(payloads->list[0]));
+            }
+            payloads->list[j] = p;
+
+            payloads->count += count;
+            count = 1;
+        }
     }
-  }
-  return count; /* zero or one */
+    return count; /* zero or one */
 }
 
-static unsigned payloads_datagram_add_nocookie(struct PayloadsUDP *payloads,
-                                               const unsigned char *buf,
-                                               size_t length,
-                                               struct RangeList *ports,
-                                               unsigned source_port) {
-  return payloads_datagram_add(payloads, buf, length, ports, source_port, 0);
+static unsigned payloads_datagram_add_nocookie(struct PayloadsUDP* payloads,
+                                               const unsigned char* buf, size_t length,
+                                               struct RangeList* ports, unsigned source_port)
+{
+    return payloads_datagram_add(payloads, buf, length, ports, source_port, 0);
 }
 
 /***************************************************************************
@@ -672,102 +686,105 @@ static unsigned payloads_datagram_add_nocookie(struct PayloadsUDP *payloads,
  * headers of the packets then preserves just the payload portion
  * and port number.
  ***************************************************************************/
-void payloads_read_pcap(const char *filename, struct PayloadsUDP *payloads,
-                        struct PayloadsUDP *oproto_payloads) {
-  struct PcapFile *pcap;
-  unsigned count = 0;
+void payloads_read_pcap(const char* filename, struct PayloadsUDP* payloads,
+                        struct PayloadsUDP* oproto_payloads)
+{
+    struct PcapFile* pcap;
+    unsigned count = 0;
 
-  LOG(2, "payloads:'%s': opening packet capture\n", filename);
+    LOG(2, "payloads:'%s': opening packet capture\n", filename);
 
-  /* open packet-capture */
-  pcap = pcapfile_openread(filename);
-  if (pcap == NULL) {
-    fprintf(stderr, "payloads: can't read from file '%s'\n", filename);
-    return;
-  }
-
-  /* for all packets in the capture file
-   *  - read in packet
-   *  - parse packet
-   *  - save payload
-   */
-  for (;;) {
-    unsigned x;
-    unsigned captured_length;
-    unsigned char buf[65536];
-    struct PreprocessedInfo parsed;
-    struct RangeList ports[1] = {{0}};
-    struct Range range[1] = {{0}};
-
-    /*
-     * Read the next packet from the capture file
-     */
+    /* open packet-capture */
+    pcap = pcapfile_openread(filename);
+    if (pcap == NULL)
     {
-      unsigned time_secs;
-      unsigned time_usecs;
-      unsigned original_length;
-
-      x = pcapfile_readframe(pcap, &time_secs, &time_usecs, &original_length,
-                             &captured_length, buf, (unsigned)sizeof(buf));
+        fprintf(stderr, "payloads: can't read from file '%s'\n", filename);
+        return;
     }
-    if (!x)
-      break;
 
-    /*
-     * Parse the packet up to its headers
+    /* for all packets in the capture file
+     *  - read in packet
+     *  - parse packet
+     *  - save payload
      */
-    x = preprocess_frame(buf, captured_length, 1, &parsed);
-    if (!x)
-      continue; /* corrupt packet */
+    for (;;)
+    {
+        unsigned x;
+        unsigned captured_length;
+        unsigned char buf[65536];
+        struct PreprocessedInfo parsed;
+        struct RangeList ports[1] = {{0}};
+        struct Range range[1] = {{0}};
 
-    /*
-     * Make sure it has UDP
-     */
-    switch (parsed.found) {
-    case FOUND_DNS:
-    case FOUND_UDP:
-      /*
-       * Kludge: mark the port in the format the API wants
-       */
-      ports->list = range;
-      ports->count = 1;
-      ports->max = 1;
-      range->begin = parsed.port_dst;
-      range->end = range->begin;
+        /*
+         * Read the next packet from the capture file
+         */
+        {
+            unsigned time_secs;
+            unsigned time_usecs;
+            unsigned original_length;
 
-      /*
-       * Now we've completely parsed the record, so add it to our
-       * list of payloads
-       */
-      count += payloads_datagram_add(payloads, buf + parsed.app_offset,
-                                     parsed.app_length, ports, 0x10000, 0);
-      break;
-    case FOUND_OPROTO:
-      /*
-       * Kludge: mark the port in the format the API wants
-       */
-      ports->list = range;
-      ports->count = 1;
-      ports->max = 1;
-      range->begin = parsed.ip_protocol;
-      range->end = range->begin;
+            x = pcapfile_readframe(pcap, &time_secs, &time_usecs, &original_length,
+                                   &captured_length, buf, (unsigned) sizeof(buf));
+        }
+        if (!x)
+            break;
 
-      /*
-       * Now we've completely parsed the record, so add it to our
-       * list of payloads
-       */
-      count +=
-          payloads_datagram_add(oproto_payloads, buf + parsed.transport_offset,
-                                parsed.transport_length, ports, 0x10000, 0);
-      break;
-    default:
-      continue;
+        /*
+         * Parse the packet up to its headers
+         */
+        x = preprocess_frame(buf, captured_length, 1, &parsed);
+        if (!x)
+            continue; /* corrupt packet */
+
+        /*
+         * Make sure it has UDP
+         */
+        switch (parsed.found)
+        {
+            case FOUND_DNS:
+            case FOUND_UDP:
+                /*
+                 * Kludge: mark the port in the format the API wants
+                 */
+                ports->list = range;
+                ports->count = 1;
+                ports->max = 1;
+                range->begin = parsed.port_dst;
+                range->end = range->begin;
+
+                /*
+                 * Now we've completely parsed the record, so add it to our
+                 * list of payloads
+                 */
+                count += payloads_datagram_add(payloads, buf + parsed.app_offset, parsed.app_length,
+                                               ports, 0x10000, 0);
+                break;
+            case FOUND_OPROTO:
+                /*
+                 * Kludge: mark the port in the format the API wants
+                 */
+                ports->list = range;
+                ports->count = 1;
+                ports->max = 1;
+                range->begin = parsed.ip_protocol;
+                range->end = range->begin;
+
+                /*
+                 * Now we've completely parsed the record, so add it to our
+                 * list of payloads
+                 */
+                count += payloads_datagram_add(oproto_payloads, buf + parsed.transport_offset,
+                                               parsed.transport_length, ports, 0x10000, 0);
+                break;
+            default:
+                continue;
+        }
     }
-  }
 
-  LOG(2, "payloads:'%s': imported %u unique payloads\n", filename, count);
-  LOG(2, "payloads:'%s': closed packet capture\n", filename);
-  pcapfile_close(pcap);
+    LOG(2, "payloads:'%s': imported %u unique payloads\n", filename, count);
+    LOG(2, "payloads:'%s': closed packet capture\n", filename);
+    pcapfile_close(pcap);
 }
 
 /***************************************************************************
@@ -775,84 +792,89 @@ void payloads_read_pcap(const char *filename, struct PayloadsUDP *payloads,
  * "nmap-payloads". We call the function 'read_nmap_payloads()" defined
  * in a different file that focuses on parsing that file format.
  ***************************************************************************/
-void payloads_udp_readfile(FILE *fp, const char *filename,
-                           struct PayloadsUDP *payloads) {
-  read_nmap_payloads(fp, filename, payloads, payloads_datagram_add_nocookie);
+void payloads_udp_readfile(FILE* fp, const char* filename, struct PayloadsUDP* payloads)
+{
+    read_nmap_payloads(fp, filename, payloads, payloads_datagram_add_nocookie);
 }
 
 /***************************************************************************
  ***************************************************************************/
-struct PayloadsUDP *payloads_udp_create(void) {
-  unsigned i;
-  struct PayloadsUDP *payloads;
-  struct PayloadUDP_Default *hard_coded = hard_coded_udp_payloads;
+struct PayloadsUDP* payloads_udp_create(void)
+{
+    unsigned i;
+    struct PayloadsUDP* payloads;
+    struct PayloadUDP_Default* hard_coded = hard_coded_udp_payloads;
 
-  payloads = CALLOC(1, sizeof(*payloads));
+    payloads = CALLOC(1, sizeof(*payloads));
 
-  /*
-   * For popular parts, include some hard-coded default UDP payloads
-   */
-  for (i = 0; hard_coded[i].length; i++) {
-    // struct Range range;
-    struct RangeList list = {0};
-    unsigned length;
+    /*
+     * For popular parts, include some hard-coded default UDP payloads
+     */
+    for (i = 0; hard_coded[i].length; i++)
+    {
+        // struct Range range;
+        struct RangeList list = {0};
+        unsigned length;
 
-    /* Kludge: create a pseudo-rangelist to hold the one port */
-    /*list.list = &range;
-     list.count = 1;
-     range.begin = hard_coded[i].port;
-     range.end = range.begin;*/
-    rangelist_add_range(&list, hard_coded[i].port, hard_coded[i].port);
+        /* Kludge: create a pseudo-rangelist to hold the one port */
+        /*list.list = &range;
+         list.count = 1;
+         range.begin = hard_coded[i].port;
+         range.end = range.begin;*/
+        rangelist_add_range(&list, hard_coded[i].port, hard_coded[i].port);
 
-    length = hard_coded[i].length;
-    if (length == 0xFFFFFFFF)
-      length = (unsigned)strlen(hard_coded[i].buf);
+        length = hard_coded[i].length;
+        if (length == 0xFFFFFFFF)
+            length = (unsigned) strlen(hard_coded[i].buf);
 
-    /* Add this to our real payloads. This will get overwritten
-     * if the user adds their own with the same port */
-    payloads_datagram_add(payloads, (const unsigned char *)hard_coded[i].buf,
-                          length, &list, hard_coded[i].source_port,
-                          hard_coded[i].set_cookie);
+        /* Add this to our real payloads. This will get overwritten
+         * if the user adds their own with the same port */
+        payloads_datagram_add(payloads, (const unsigned char*) hard_coded[i].buf, length, &list,
+                              hard_coded[i].source_port, hard_coded[i].set_cookie);
 
-    rangelist_remove_all(&list);
-  }
-  return payloads;
+        rangelist_remove_all(&list);
+    }
+    return payloads;
 }
 
 /***************************************************************************
  * (same code as for UDP)
  ***************************************************************************/
-struct PayloadsUDP *payloads_oproto_create(void) {
-  unsigned i;
-  struct PayloadsUDP *payloads;
-  struct PayloadUDP_Default *hard_coded = hard_coded_oproto_payloads;
+struct PayloadsUDP* payloads_oproto_create(void)
+{
+    unsigned i;
+    struct PayloadsUDP* payloads;
+    struct PayloadUDP_Default* hard_coded = hard_coded_oproto_payloads;
 
-  payloads = CALLOC(1, sizeof(*payloads));
+    payloads = CALLOC(1, sizeof(*payloads));
 
-  /*
-   * Some hard-coded ones, like GRE
-   */
-  for (i = 0; hard_coded[i].length; i++) {
-    // struct Range range;
-    struct RangeList list = {0};
-    unsigned length;
+    /*
+     * Some hard-coded ones, like GRE
+     */
+    for (i = 0; hard_coded[i].length; i++)
+    {
+        // struct Range range;
+        struct RangeList list = {0};
+        unsigned length;
 
-    /* Kludge: create a pseudo-rangelist to hold the one port */
-    rangelist_add_range(&list, hard_coded[i].port, hard_coded[i].port);
+        /* Kludge: create a pseudo-rangelist to hold the one port */
+        rangelist_add_range(&list, hard_coded[i].port, hard_coded[i].port);
 
-    length = hard_coded[i].length;
-    if (length == 0xFFFFFFFF)
-      length = (unsigned)strlen(hard_coded[i].buf);
+        length = hard_coded[i].length;
+        if (length == 0xFFFFFFFF)
+            length = (unsigned) strlen(hard_coded[i].buf);
 
-    /* Add this to our real payloads. This will get overwritten
-     * if the user adds their own with the same port */
-    payloads_datagram_add(payloads, (const unsigned char *)hard_coded[i].buf,
-                          length, &list, hard_coded[i].source_port,
-                          hard_coded[i].set_cookie);
+        /* Add this to our real payloads. This will get overwritten
+         * if the user adds their own with the same port */
+        payloads_datagram_add(payloads, (const unsigned char*) hard_coded[i].buf, length, &list,
+                              hard_coded[i].source_port, hard_coded[i].set_cookie);
 
-    rangelist_remove_all(&list);
-  }
-  return payloads;
+        rangelist_remove_all(&list);
+    }
+    return payloads;
 }
 
-int templ_payloads_selftest(void) { return templ_nmap_selftest(); }
+int templ_payloads_selftest(void)
+{
+    return templ_nmap_selftest();
+}

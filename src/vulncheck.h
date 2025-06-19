@@ -3,37 +3,37 @@
 #include <stdio.h>
 struct TemplatePacket;
 
-struct MassVulnCheck {
-  const char *name;
+struct MassVulnCheck
+{
+    const char* name;
 
-  /**
-   * A list of default port ranges that should be used in case that none
-   * are specified.
-   */
-  const char *ports;
+    /**
+     * A list of default port ranges that should be used in case that none
+     * are specified.
+     */
+    const char* ports;
 
-  /**
-   * The hello packet template
-   */
-  const unsigned char *packet;
+    /**
+     * The hello packet template
+     */
+    const unsigned char* packet;
 
-  /**
-   * The hello packet template length
-   */
-  unsigned packet_length;
+    /**
+     * The hello packet template length
+     */
+    unsigned packet_length;
 
-  /**
-   * Called to change the template based upon the target
-   */
-  void (*set_target)(struct TemplatePacket *tmpl, unsigned ip_them,
-                     unsigned port_them, unsigned ip_me, unsigned port_me,
-                     unsigned seqno, unsigned char *px, size_t sizeof_px,
-                     size_t *r_length);
+    /**
+     * Called to change the template based upon the target
+     */
+    void (*set_target)(struct TemplatePacket* tmpl, unsigned ip_them, unsigned port_them,
+                       unsigned ip_me, unsigned port_me, unsigned seqno, unsigned char* px,
+                       size_t sizeof_px, size_t* r_length);
 
-  /**
-   * Called at startup to change the template according to options
-   */
-  void (*init)(struct TemplatePacket *tmpl);
+    /**
+     * Called at startup to change the template according to options
+     */
+    void (*init)(struct TemplatePacket* tmpl);
 };
 
 /**
@@ -43,6 +43,6 @@ struct MassVulnCheck {
  * @return
  *      The desired vuln check if found, NULL if the vuln check doesn't exist
  */
-struct MassVulnCheck *vulncheck_lookup(const char *name);
+struct MassVulnCheck* vulncheck_lookup(const char* name);
 
 #endif

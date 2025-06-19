@@ -15,7 +15,7 @@ struct TemplateSet;
  *      0 on success
  */
 int rawsock_selftest(void);
-int rawsock_selftest_if(const char *ifname);
+int rawsock_selftest_if(const char* ifname);
 
 void rawsock_init(void);
 
@@ -40,11 +40,9 @@ void rawsock_init(void);
  * @return
  *      a fully instantiated network adapter
  */
-struct Adapter *rawsock_init_adapter(const char *adapter_name,
-                                     unsigned is_pfring, unsigned is_sendq,
-                                     unsigned is_packet_trace,
-                                     unsigned is_offline,
-                                     const char *bpf_filter, unsigned is_vlan,
+struct Adapter* rawsock_init_adapter(const char* adapter_name, unsigned is_pfring,
+                                     unsigned is_sendq, unsigned is_packet_trace,
+                                     unsigned is_offline, const char* bpf_filter, unsigned is_vlan,
                                      unsigned vlan_id);
 
 /**
@@ -53,27 +51,25 @@ struct Adapter *rawsock_init_adapter(const char *adapter_name,
  */
 void rawsock_list_adapters(void);
 
-void rawsock_send_probe_ipv4(struct Adapter *adapter, ipv4address ip_them,
-                             unsigned port_them, ipv4address ip_me,
-                             unsigned port_me, unsigned seqno, unsigned flush,
-                             struct TemplateSet *tmplset);
+void rawsock_send_probe_ipv4(struct Adapter* adapter, ipv4address ip_them, unsigned port_them,
+                             ipv4address ip_me, unsigned port_me, unsigned seqno, unsigned flush,
+                             struct TemplateSet* tmplset);
 
-void rawsock_send_probe_ipv6(struct Adapter *adapter, ipv6address ip_them,
-                             unsigned port_them, ipv6address ip_me,
-                             unsigned port_me, unsigned seqno, unsigned flush,
-                             struct TemplateSet *tmplset);
+void rawsock_send_probe_ipv6(struct Adapter* adapter, ipv6address ip_them, unsigned port_them,
+                             ipv6address ip_me, unsigned port_me, unsigned seqno, unsigned flush,
+                             struct TemplateSet* tmplset);
 
 /**
  * Queries the operating-system's network-stack in order to discover
  * the best IPv4 address to use inside our own custom network-stack.
  */
-unsigned rawsock_get_adapter_ip(const char *ifname);
+unsigned rawsock_get_adapter_ip(const char* ifname);
 
 /**
  * Queries the operating-system's network-stack in order to discover
  * the best IPv6 address to use inside our own custom network-stack.
  */
-ipv6address rawsock_get_adapter_ipv6(const char *ifname);
+ipv6address rawsock_get_adapter_ipv6(const char* ifname);
 
 /**
  * Given the network adapter name, like 'eth0', find the hardware
@@ -81,14 +77,14 @@ ipv6address rawsock_get_adapter_ipv6(const char *ifname);
  * packets, and need to use the interface's MAC address as the
  * source address
  */
-int rawsock_get_adapter_mac(const char *ifname, unsigned char *mac);
+int rawsock_get_adapter_mac(const char* ifname, unsigned char* mac);
 
-int rawsock_get_default_gateway(const char *ifname, unsigned *ipv4);
-int rawsock_get_default_interface(char *ifname, size_t sizeof_ifname);
+int rawsock_get_default_gateway(const char* ifname, unsigned* ipv4);
+int rawsock_get_default_interface(char* ifname, size_t sizeof_ifname);
 
-const char *rawsock_win_name(const char *ifname);
+const char* rawsock_win_name(const char* ifname);
 
-int rawsock_is_adapter_names_equal(const char *lhs, const char *rhs);
+int rawsock_is_adapter_names_equal(const char* lhs, const char* rhs);
 
 /**
  * Transmit any queued (but not yet transmitted) packets. Useful only when
@@ -96,10 +92,10 @@ int rawsock_is_adapter_names_equal(const char *lhs, const char *rhs);
  * whenever the transmit queue is full, this is only needed in boundary
  * cases, like when shutting down.
  */
-void rawsock_flush(struct Adapter *adapter);
+void rawsock_flush(struct Adapter* adapter);
 
-int rawsock_send_packet(struct Adapter *adapter, const unsigned char *packet,
-                        unsigned length, unsigned flush);
+int rawsock_send_packet(struct Adapter* adapter, const unsigned char* packet, unsigned length,
+                        unsigned flush);
 
 /**
  * Called to read the next packet from the network.
@@ -121,9 +117,8 @@ int rawsock_send_packet(struct Adapter *adapter, const unsigned char *packet,
  *      0 for success, something else for failure
  *
  */
-int rawsock_recv_packet(struct Adapter *adapter, unsigned *length,
-                        unsigned *secs, unsigned *usecs,
-                        const unsigned char **packet);
+int rawsock_recv_packet(struct Adapter* adapter, unsigned* length, unsigned* secs, unsigned* usecs,
+                        const unsigned char** packet);
 
 /**
  * Optimization functions to tell the underlying network stack
@@ -131,6 +126,6 @@ int rawsock_recv_packet(struct Adapter *adapter, unsigned *length,
  * adapters receive the packets they send, which will cause us a lot
  * of work requiring us to process the flood of packets we generate.
  */
-void rawsock_ignore_transmits(struct Adapter *adapter, const char *ifname);
+void rawsock_ignore_transmits(struct Adapter* adapter, const char* ifname);
 
 #endif

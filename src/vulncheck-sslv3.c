@@ -16,4 +16,4 @@ static const char sslv3_hello[] =
     "\x00\x38\x00\x35\x00\x33\x00\x32\x00\x04\x00\x05\x00\x2f\x00\x16"
     "\x00\x13\xfe\xff\x00\x0a\x01\x00";
 
-const char *ssl_hello_sslv3_template = sslv3_hello;
+const char* ssl_hello_sslv3_template = sslv3_hello;

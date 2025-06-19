@@ -10,10 +10,8 @@ extern struct ProtocolParserStream banner_http;
  * like "--http-field <name=value>" to add/change a field in the HTTP
  * header.
  */
-size_t http_change_field(unsigned char **inout_header, size_t header_length,
-                         const char *field_name,
-                         const unsigned char *field_value,
-                         size_t field_value_len, int what);
+size_t http_change_field(unsigned char** inout_header, size_t header_length, const char* field_name,
+                         const unsigned char* field_value, size_t field_value_len, int what);
 
 /**
  * Called during configuration when processing a command-line option
@@ -24,8 +22,7 @@ size_t http_change_field(unsigned char **inout_header, size_t header_length,
  * @return
  *   the new length of the header (expanded or shrunk)
  */
-size_t http_change_requestline(unsigned char **inout_header,
-                               size_t header_length, const void *url,
+size_t http_change_requestline(unsigned char** inout_header, size_t header_length, const void* url,
                                size_t url_length, int item);
 
 #endif
