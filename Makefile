@@ -2,7 +2,7 @@
 # MinGW environment. I can't figure out how to tell if it's
 # actually MingGW. FIXME TODO
 ifeq ($(OS),Windows_NT)
-    CC = clang
+    CC = gcc
 endif
 
 # Try to figure out the default compiler. I dont know the best
@@ -97,7 +97,7 @@ FLAGS2 =
 endif
 
 
-DEFINES = -DWIN32 -Wno-incompatible-function-pointer-types
+DEFINES = 
 CFLAGS = -g -ggdb $(FLAGS2) $(INCLUDES) $(DEFINES) -Wall -O2
 .SUFFIXES: .c .cpp
 

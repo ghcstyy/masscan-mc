@@ -1,0 +1,2 @@
+CompileFlags:
+  Add: [-DWIN32, -Wno-incompatible-function-pointer-types]

@@ -5,20 +5,23 @@
 
 struct ProtocolParserStream;
 
-enum TCP__flags {
-  TCP__static, /* it's static data, so the send function can point to it */
-  TCP__copy,   /* the send function must copy the data */
-  TCP__adopt,  /* the buffer was just allocated, so the send function can adopt
-                  the pointer */
+enum TCP__flags
+{
+  TCP__static,   /* it's static data, so the send function can point to it */
+  TCP__copy,     /* the send function must copy the data */
+  TCP__adopt,    /* the buffer was just allocated, so the send function can adopt
+                    the pointer */
   TCP__close_fin /* close connection */
 };
 
-enum {
+enum
+{
   SOCKERR_NONE = 0,   /* no error */
   SOCKERR_EBADF = 10, /* bad socket descriptor */
 };
 
-typedef struct stack_handle_t {
+typedef struct stack_handle_t
+{
   void *tcpcon;
   void *tcb;
   unsigned secs;
