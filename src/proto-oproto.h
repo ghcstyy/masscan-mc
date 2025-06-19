@@ -9,17 +9,13 @@
 struct Output;
 struct PreprocessedInfo;
 
-
 /**
  * Parse an incoming response.
  * @param entropy
  *      The random seed, used in calculating syn-cookies.
  */
-void
-handle_oproto(struct Output *out, time_t timestamp,
-           const unsigned char *px, unsigned length,
-           struct PreprocessedInfo *parsed,
-           uint64_t entropy);
+void handle_oproto(struct Output *out, time_t timestamp,
+                   const unsigned char *px, unsigned length,
+                   struct PreprocessedInfo *parsed, uint64_t entropy);
 
 #endif
-

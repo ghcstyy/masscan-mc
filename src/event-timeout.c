@@ -31,10 +31,8 @@
 #include <string.h>
 #include <time.h>
 
-
-
 /***************************************************************************
- * The timeout system is a circular ring. We move an index around the 
+ * The timeout system is a circular ring. We move an index around the
  * ring. At each slot in the ring is a linked-list of all entries at
  * that time index. Because the ring can wrap, not everything at a given
  * entry will be the same timestamp. Therefore, when doing the timeout
@@ -42,135 +40,126 @@
  * those things that are further in the future.
  ***************************************************************************/
 struct Timeouts {
-    /**
-     * This index is a monotonically increasing number, modulus the mask.
-     * Every time we check timeouts, we simply move it forward in time.
-     */
-    uint64_t current_index;
+  /**
+   * This index is a monotonically increasing number, modulus the mask.
+   * Every time we check timeouts, we simply move it forward in time.
+   */
+  uint64_t current_index;
 
-    /**
-     * Counts the number of outstanding timeouts. Adding a timeout increments
-     * this number, and removing a timeout decrements this number. The
-     * program shouldn't exit until this number is zero.
-     */
-    uint64_t outstanding_count;
+  /**
+   * Counts the number of outstanding timeouts. Adding a timeout increments
+   * this number, and removing a timeout decrements this number. The
+   * program shouldn't exit until this number is zero.
+   */
+  uint64_t outstanding_count;
 
-    /**
-     * The number of slots is a power-of-2, so the mask is just this
-     * number minus 1
-     */
-    unsigned mask;
+  /**
+   * The number of slots is a power-of-2, so the mask is just this
+   * number minus 1
+   */
+  unsigned mask;
 
-    /**
-     * The ring of entries.
-     */
-    struct TimeoutEntry *slots[1024*1024];
+  /**
+   * The ring of entries.
+   */
+  struct TimeoutEntry *slots[1024 * 1024];
 };
 
 /***************************************************************************
  ***************************************************************************/
-struct Timeouts *
-timeouts_create(uint64_t timestamp)
-{
-    struct Timeouts *timeouts;
+struct Timeouts *timeouts_create(uint64_t timestamp) {
+  struct Timeouts *timeouts;
 
-    /*
-     * Allocate memory and initialize it to zero
-     */
-    timeouts = CALLOC(1, sizeof(*timeouts));
-    
-    /*
-     * We just mask off the low order bits to determine wrap. I'm using
-     * a variable here because one of these days I'm going to make
-     * the size of the ring dynamically adjustable depending upon
-     * the speed of the scan.
-     */
-    timeouts->mask = sizeof(timeouts->slots)/sizeof(timeouts->slots[0]) - 1;
+  /*
+   * Allocate memory and initialize it to zero
+   */
+  timeouts = CALLOC(1, sizeof(*timeouts));
 
-    /*
-     * Set the index to the current time. Note that this timestamp is
-     * the 'time_t' value multiplied by the number of ticks-per-second,
-     * where 'ticks' is something I've defined for scanning. Right now
-     * I hard-code in the size of the ticks, but eventually they'll be
-     * dynamically resized depending upon the speed of the scan.
-     */
-    timeouts->current_index = timestamp;
+  /*
+   * We just mask off the low order bits to determine wrap. I'm using
+   * a variable here because one of these days I'm going to make
+   * the size of the ring dynamically adjustable depending upon
+   * the speed of the scan.
+   */
+  timeouts->mask = sizeof(timeouts->slots) / sizeof(timeouts->slots[0]) - 1;
 
+  /*
+   * Set the index to the current time. Note that this timestamp is
+   * the 'time_t' value multiplied by the number of ticks-per-second,
+   * where 'ticks' is something I've defined for scanning. Right now
+   * I hard-code in the size of the ticks, but eventually they'll be
+   * dynamically resized depending upon the speed of the scan.
+   */
+  timeouts->current_index = timestamp;
 
-    return timeouts;
+  return timeouts;
 }
 
 /***************************************************************************
  * This inserts the timeout entry into the appropriate place in the
  * timeout ring.
  ***************************************************************************/
-void
-timeouts_add(struct Timeouts *timeouts, struct TimeoutEntry *entry,
-             size_t offset, uint64_t timestamp)
-{
-    unsigned index;
+void timeouts_add(struct Timeouts *timeouts, struct TimeoutEntry *entry,
+                  size_t offset, uint64_t timestamp) {
+  unsigned index;
 
-    /* Unlink from wherever the entry came from */
-    if (entry->timestamp)
-        timeouts->outstanding_count--;
-    timeout_unlink(entry);
+  /* Unlink from wherever the entry came from */
+  if (entry->timestamp)
+    timeouts->outstanding_count--;
+  timeout_unlink(entry);
 
-    if (entry->prev) {
-        LOG(1, "***CHANGE %d-seconds\n", 
-                    (int)((timestamp-entry->timestamp)/TICKS_PER_SECOND));
-    }
+  if (entry->prev) {
+    LOG(1, "***CHANGE %d-seconds\n",
+        (int)((timestamp - entry->timestamp) / TICKS_PER_SECOND));
+  }
 
-    /* Initialize the new entry */
-    entry->timestamp = timestamp;
-    entry->offset = (unsigned)offset;
+  /* Initialize the new entry */
+  entry->timestamp = timestamp;
+  entry->offset = (unsigned)offset;
 
-    /* Link it into it's new location */
-    index = timestamp & timeouts->mask;
-    entry->next = timeouts->slots[index];
-    timeouts->slots[index] = entry;
-    entry->prev = &timeouts->slots[index];
-    if (entry->next)
-        entry->next->prev = &entry->next;
+  /* Link it into it's new location */
+  index = timestamp & timeouts->mask;
+  entry->next = timeouts->slots[index];
+  timeouts->slots[index] = entry;
+  entry->prev = &timeouts->slots[index];
+  if (entry->next)
+    entry->next->prev = &entry->next;
 
-    timeouts->outstanding_count++;
+  timeouts->outstanding_count++;
 }
 
 /***************************************************************************
  * Remove the next event that it older than the specified timestamp
  ***************************************************************************/
-void *
-timeouts_remove(struct Timeouts *timeouts, uint64_t timestamp)
-{
-    struct TimeoutEntry *entry = NULL;
+void *timeouts_remove(struct Timeouts *timeouts, uint64_t timestamp) {
+  struct TimeoutEntry *entry = NULL;
 
-    /* Search until we find one */
-    while (timeouts->current_index <= timestamp) {
+  /* Search until we find one */
+  while (timeouts->current_index <= timestamp) {
 
-        /* Start at the current slot */
-        entry = timeouts->slots[timeouts->current_index & timeouts->mask];
+    /* Start at the current slot */
+    entry = timeouts->slots[timeouts->current_index & timeouts->mask];
 
-        /* enumerate through the linked list until we find a used slot */
-        while (entry && entry->timestamp > timestamp)
-            entry = entry->next;
-        if (entry)
-            break;
+    /* enumerate through the linked list until we find a used slot */
+    while (entry && entry->timestamp > timestamp)
+      entry = entry->next;
+    if (entry)
+      break;
 
-        /* found nothing at this slot, so move to next slot */
-        timeouts->current_index++;
-    }
+    /* found nothing at this slot, so move to next slot */
+    timeouts->current_index++;
+  }
 
-    if (entry == NULL) {
-        /* we've caught up to the current time, and there's nothing
-         * left to timeout, so return NULL */
-        return NULL;
-    }
+  if (entry == NULL) {
+    /* we've caught up to the current time, and there's nothing
+     * left to timeout, so return NULL */
+    return NULL;
+  }
 
-    /* unlink this entry from the timeout system */
-    timeouts--;
-    timeout_unlink(entry);
+  /* unlink this entry from the timeout system */
+  timeouts--;
+  timeout_unlink(entry);
 
-    /* return a pointer to the structure holding this entry */
-    return ((char*)entry) - entry->offset;
+  /* return a pointer to the structure holding this entry */
+  return ((char *)entry) - entry->offset;
 }
-
-

@@ -16,14 +16,12 @@ enum PortStatus {
 #endif
 
 enum PortStatus {
-    PortStatus_Unknown,
-    PortStatus_Open,
-    PortStatus_Closed,
-    PortStatus_Arp,
-    PortStatus_Count
+  PortStatus_Unknown,
+  PortStatus_Open,
+  PortStatus_Closed,
+  PortStatus_Arp,
+  PortStatus_Count
 
 };
-
-
 
 #endif

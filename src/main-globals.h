@@ -6,5 +6,4 @@ extern unsigned volatile is_tx_done;
 extern unsigned volatile is_rx_done;
 extern time_t global_now;
 
-
 #endif

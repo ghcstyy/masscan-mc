@@ -23,9 +23,6 @@ rates of less than 10,000 packets-per-second. That seems excessively low.
 I assume the actual reason is because of policy enforcement limiting traffic
 rates rather than overloading network equipment.
 
-
-
 # Issues
 
 - [#546 fast scan get result](https://github.com/robertdavidgraham/masscan/issues/546)
-

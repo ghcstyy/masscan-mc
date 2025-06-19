@@ -4,5 +4,4 @@
 
 extern const struct ProtocolParserStream banner_vnc;
 
-
 #endif

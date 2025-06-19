@@ -1,7 +1,8 @@
 #ifndef PROTO_UDP_H
 #define PROTO_UDP_H
-#include <time.h>
 #include <stdint.h>
+#include <time.h>
+
 struct PreprocessedInfo;
 struct Output;
 
@@ -11,21 +12,16 @@ struct Output;
  * @param entropy
  *      The random seed, used in calculating syn-cookies.
  */
-void 
-handle_udp(struct Output *out, time_t timestamp,
-    const unsigned char *px, unsigned length,
-    struct PreprocessedInfo *parsed,
-    uint64_t entropy);
+void handle_udp(struct Output *out, time_t timestamp, const unsigned char *px,
+                unsigned length, struct PreprocessedInfo *parsed,
+                uint64_t entropy);
 
 /**
  * Default banner for UDP, consisting of the first 64 bytes, when it isn't
  * detected as the appropriate protocol
  */
-unsigned
-default_udp_parse(struct Output *out, time_t timestamp,
-                  const unsigned char *px, unsigned length,
-                  struct PreprocessedInfo *parsed,
-                  uint64_t entropy);
-
+unsigned default_udp_parse(struct Output *out, time_t timestamp,
+                           const unsigned char *px, unsigned length,
+                           struct PreprocessedInfo *parsed, uint64_t entropy);
 
 #endif

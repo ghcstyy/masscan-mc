@@ -3,9 +3,10 @@
 ## Question
 
 Some example questions:
-* Why is `masscan` appearing in my server logs?
-* Why are you scanning me?
-* Why is my server trying to connect to this github repo?
+
+- Why is `masscan` appearing in my server logs?
+- Why are you scanning me?
+- Why is my server trying to connect to this github repo?
 
 ## Answer
 
@@ -25,4 +26,3 @@ scans to gather information about the state of the Internet. Of course,
 some are indeed malicious, scanning to find vulnerabilities. However,
 even when malicious, they probably aren't targetting you in particular,
 but are instead scanning everybody.
-

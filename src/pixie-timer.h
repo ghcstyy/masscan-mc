@@ -29,7 +29,4 @@ void pixie_mssleep(unsigned milliseconds);
  */
 int pixie_time_selftest(void);
 
-
-
-
 #endif

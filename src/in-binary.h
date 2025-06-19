@@ -8,9 +8,7 @@ struct Masscan;
  * The intent is that the user can then re-output in another format like
  * JSON or XML.
  */
-void
-readscan_binary_scanfile(struct Masscan *masscan, 
-                     int arg_first, int arg_max, char *argv[]);
+void readscan_binary_scanfile(struct Masscan *masscan, int arg_first,
+                              int arg_max, char *argv[]);
 
 #endif
-

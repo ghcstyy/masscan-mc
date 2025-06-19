@@ -4,8 +4,8 @@
 struct Output;
 struct PreprocessedInfo;
 
-
-void
-arp_recv_response(struct Output *out, time_t timestamp, const unsigned char *px, unsigned length, struct PreprocessedInfo *parsed);
+void arp_recv_response(struct Output *out, time_t timestamp,
+                       const unsigned char *px, unsigned length,
+                       struct PreprocessedInfo *parsed);
 
 #endif

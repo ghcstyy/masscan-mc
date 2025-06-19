@@ -38,7 +38,7 @@ extern void primegen_fill(primegen *);
 extern void primegen_init(primegen *);
 extern uint64_t primegen_next(primegen *);
 extern uint64_t primegen_peek(primegen *);
-extern uint64_t primegen_count(primegen *,uint64_t to);
-extern void primegen_skipto(primegen *,uint64_t to);
+extern uint64_t primegen_count(primegen *, uint64_t to);
+extern void primegen_skipto(primegen *, uint64_t to);
 
 #endif

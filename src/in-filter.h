@@ -12,11 +12,8 @@ struct MassIP;
  * Filters readscan record by IP address, port number,
  * or banner-type.
  */
-int
-readscan_filter_pass(ipaddress ip, unsigned port, unsigned type,
-              const struct MassIP *massip,
-              const struct RangeList *btypes);
-
-
+int readscan_filter_pass(ipaddress ip, unsigned port, unsigned type,
+                         const struct MassIP *massip,
+                         const struct RangeList *btypes);
 
 #endif

@@ -2,7 +2,6 @@
 #define MAIN_READRANGE_H
 struct Masscan;
 
-void
-main_readrange(struct Masscan *masscan);
+void main_readrange(struct Masscan *masscan);
 
 #endif

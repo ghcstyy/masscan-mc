@@ -4,6 +4,4 @@
 
 extern const struct ProtocolParserStream banner_versioning;
 
-
 #endif
-

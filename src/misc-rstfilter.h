@@ -1,6 +1,6 @@
 /*
  RST filter
- 
+
  In theory, we should transmit a RST packet every time we receive an invalid
  TCP packet. In practice, this can lead to endless transmits when the other
  size continues to transmit bad packets. This may happen accidentally, or this
@@ -9,7 +9,7 @@
  to do that, replying back as fast as the scanner transmits (when running
  at 10,000 packets per-second). This halts the scan, as it's throttle limit
  is filled sending RSTs and not doing something useful.
- 
+
  The design is a simple non-deterministic algorithm. It hashes the
  IP/prot combo, then updates a counter at that bucket. When it reaches
  its limit, it stops transmitting resets. However, it'll also slowly
@@ -17,8 +17,8 @@
  */
 #ifndef MISC_RSTFILTER_H
 #define MISC_RSTFILTER_H
-#include <stdio.h>
 #include "massip-addr.h"
+#include <stdio.h>
 
 struct ResetFilter;
 
@@ -33,14 +33,13 @@ struct ResetFilter;
  * @return an instance of this object that should be eventually
  *      cleaned up with 'rstfilter_destroy()'.
  */
-struct ResetFilter *
-rstfilter_create(unsigned long long seed, size_t bucket_count);
+struct ResetFilter *rstfilter_create(unsigned long long seed,
+                                     size_t bucket_count);
 
 /**
  * Cleans up the object that was created with 'rstfilter_create()'.
  */
-void
-rstfilter_destroy(struct ResetFilter *rf);
+void rstfilter_destroy(struct ResetFilter *rf);
 
 /**
  * Tests to see if we should ignore the given RST packet. This will
@@ -48,13 +47,9 @@ rstfilter_destroy(struct ResetFilter *rf);
  * @return 1 if we should filter out the offending packet and ignore it,
  *          or else 0 if we shouldn't ignore it.
  */
-int
-rstfilter_is_filter(struct ResetFilter *rf, ipaddress src_ip, unsigned src_port, ipaddress dst_ip, unsigned dst_port);
+int rstfilter_is_filter(struct ResetFilter *rf, ipaddress src_ip,
+                        unsigned src_port, ipaddress dst_ip, unsigned dst_port);
 
-int
-rstfilter_selftest(void);
-
-
+int rstfilter_selftest(void);
 
 #endif
-

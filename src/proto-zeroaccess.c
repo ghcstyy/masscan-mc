@@ -8,13 +8,12 @@
 
 */
 #include "proto-zeroaccess.h"
-#include "proto-preprocess.h"
 #include "output.h"
 #include "proto-banner1.h"
+#include "proto-preprocess.h"
 #include "util-safefunc.h"
 #include <stdio.h>
 #include <string.h>
-
 
 /***************************************************************************
  * I hand-crafted this "getL" request packet. It has the ID set to "mass",
@@ -80,26 +79,22 @@ static const unsigned crc32_table[256] = {
     0xbdbdf21cL, 0xcabac28aL, 0x53b39330L, 0x24b4a3a6L, 0xbad03605L,
     0xcdd70693L, 0x54de5729L, 0x23d967bfL, 0xb3667a2eL, 0xc4614ab8L,
     0x5d681b02L, 0x2a6f2b94L, 0xb40bbe37L, 0xc30c8ea1L, 0x5a05df1bL,
-    0x2d02ef8dL
-};
-
+    0x2d02ef8dL};
 
 /***************************************************************************
  * Standard CRC32 calculation.
  ***************************************************************************/
-static unsigned
-crc_calc(const unsigned char *px, unsigned length)
-{
-    unsigned i;
-    unsigned crc;
+static unsigned crc_calc(const unsigned char *px, unsigned length) {
+  unsigned i;
+  unsigned crc;
 
-    crc = (unsigned)~0;
-    for (i = 0; i < length; i++) {
-        crc = crc32_table[(crc ^ px[i]) & 0xff] ^ (crc >> 8);
-    }
-    crc = ~crc;
+  crc = (unsigned)~0;
+  for (i = 0; i < length; i++) {
+    crc = crc32_table[(crc ^ px[i]) & 0xff] ^ (crc >> 8);
+  }
+  crc = ~crc;
 
-    return crc;
+  return crc;
 }
 
 /***************************************************************************
@@ -108,24 +103,23 @@ crc_calc(const unsigned char *px, unsigned length)
  * by one bit after every XOR. Because it's XOR, encryption is also
  * decryption.
  ***************************************************************************/
-static unsigned
-zadecrypt(const unsigned char *src, size_t src_len, unsigned char *dst, size_t dst_len)
-{
-    unsigned key;
-    size_t i;
+static unsigned zadecrypt(const unsigned char *src, size_t src_len,
+                          unsigned char *dst, size_t dst_len) {
+  unsigned key;
+  size_t i;
 
-    key = 'f'<<24 | 't'<<16 | 'p'<<8 | '2'<<0;
+  key = 'f' << 24 | 't' << 16 | 'p' << 8 | '2' << 0;
 
-    for (i=0; i<dst_len && i<src_len; i+=4) {
-        dst[i+0] = src[i+0] ^ (unsigned char)(key>> 0);
-        dst[i+1] = src[i+1] ^ (unsigned char)(key>> 8);
-        dst[i+2] = src[i+2] ^ (unsigned char)(key>>16);
-        dst[i+3] = src[i+3] ^ (unsigned char)(key>>24);
+  for (i = 0; i < dst_len && i < src_len; i += 4) {
+    dst[i + 0] = src[i + 0] ^ (unsigned char)(key >> 0);
+    dst[i + 1] = src[i + 1] ^ (unsigned char)(key >> 8);
+    dst[i + 2] = src[i + 2] ^ (unsigned char)(key >> 16);
+    dst[i + 3] = src[i + 3] ^ (unsigned char)(key >> 24);
 
-        key = key<<1 | key>>31;
-    }
+    key = key << 1 | key >> 31;
+  }
 
-    return (unsigned)src_len;
+  return (unsigned)src_len;
 }
 
 /***************************************************************************
@@ -133,32 +127,31 @@ zadecrypt(const unsigned char *src, size_t src_len, unsigned char *dst, size_t d
  * use it, because I ran it once to generate the hard-coded packet at
  * the top of this file.
  ***************************************************************************/
-static unsigned
-generate_getL(unsigned char *out_buf, size_t out_buf_len, unsigned xrand)
-{
-    unsigned char buf[16];
-    unsigned crc;
+static unsigned generate_getL(unsigned char *out_buf, size_t out_buf_len,
+                              unsigned xrand) {
+  unsigned char buf[16];
+  unsigned crc;
 
-    if (out_buf_len < 16)
-        return 0;
-    memset(buf, 0, 16);
+  if (out_buf_len < 16)
+    return 0;
+  memset(buf, 0, 16);
 
-    memcpy(&buf[4], "Lteg", 4); /* "getL" */
+  memcpy(&buf[4], "Lteg", 4); /* "getL" */
 
-    buf[12] = (unsigned char)(xrand>>24);
-    buf[13] = (unsigned char)(xrand>>16);
-    buf[14] = (unsigned char)(xrand>> 8);
-    buf[15] = (unsigned char)(xrand>> 0);
+  buf[12] = (unsigned char)(xrand >> 24);
+  buf[13] = (unsigned char)(xrand >> 16);
+  buf[14] = (unsigned char)(xrand >> 8);
+  buf[15] = (unsigned char)(xrand >> 0);
 
-    crc = crc_calc(buf, 16);
-    buf[3] = (unsigned char)(crc>>24);
-    buf[2] = (unsigned char)(crc>>16);
-    buf[1] = (unsigned char)(crc>> 8);
-    buf[0] = (unsigned char)(crc>> 0);
+  crc = crc_calc(buf, 16);
+  buf[3] = (unsigned char)(crc >> 24);
+  buf[2] = (unsigned char)(crc >> 16);
+  buf[1] = (unsigned char)(crc >> 8);
+  buf[0] = (unsigned char)(crc >> 0);
 
-    zadecrypt(buf, 16, out_buf, 16);
+  zadecrypt(buf, 16, out_buf, 16);
 
-    return 16;
+  return 16;
 }
 
 /***************************************************************************
@@ -167,140 +160,115 @@ generate_getL(unsigned char *out_buf, size_t out_buf_len, unsigned xrand)
  * therefore, we want to parse the response and grab those IP addresses
  * so that we know about even more infected machines.
  ***************************************************************************/
-unsigned
-handle_zeroaccess(  struct Output *out, time_t timestamp,
-                    const unsigned char *px, unsigned length,
-                    struct PreprocessedInfo *parsed,
-                    uint64_t entropy)
-{
-    unsigned char buf[2048];
-    unsigned len;
-    ipaddress ip_them = parsed->src_ip;
-    unsigned port_them = parsed->port_src;
-    unsigned port_me = parsed->port_dst;
-    struct BannerOutput banout[1];
+unsigned handle_zeroaccess(struct Output *out, time_t timestamp,
+                           const unsigned char *px, unsigned length,
+                           struct PreprocessedInfo *parsed, uint64_t entropy) {
+  unsigned char buf[2048];
+  unsigned len;
+  ipaddress ip_them = parsed->src_ip;
+  unsigned port_them = parsed->port_src;
+  unsigned port_me = parsed->port_dst;
+  struct BannerOutput banout[1];
 
-    banout->length = 0;
-    banout->next = 0;
-    banout->protocol = PROTO_UDP_ZEROACCESS;
+  banout->length = 0;
+  banout->next = 0;
+  banout->protocol = PROTO_UDP_ZEROACCESS;
 
-    UNUSEDPARM(entropy);
-    UNUSEDPARM(px);
-    UNUSEDPARM(length);
-    UNUSEDPARM(port_me);
+  UNUSEDPARM(entropy);
+  UNUSEDPARM(px);
+  UNUSEDPARM(length);
+  UNUSEDPARM(port_me);
 
-    /* Decrypt the response packet */
-    buf[0] = '\0';
-    len = zadecrypt(px + parsed->app_offset,
-                    parsed->app_length,
-                    buf, sizeof(buf));
-    if (len != parsed->app_length) {
-        return 0; /* is not zeroaccess botnet */
-    }
+  /* Decrypt the response packet */
+  buf[0] = '\0';
+  len =
+      zadecrypt(px + parsed->app_offset, parsed->app_length, buf, sizeof(buf));
+  if (len != parsed->app_length) {
+    return 0; /* is not zeroaccess botnet */
+  }
 
-    /* Validate the CRC */
-    {
-        unsigned old_crc;
-        unsigned new_crc;
-
-        old_crc = buf[0] | buf[1]<<8 | buf[2]<<16 | buf[3]<<24;
-        memset(buf, 0, 4);
-        new_crc = crc_calc(buf, len);
-        if (old_crc != new_crc)
-            return 0; /* not zeroaccess, or corrupted */
-    }
-
-    /* Make sure this is a "retl" packet */
-    if (len < 16 || memcmp(buf+4, "Lter", 4) != 0)
-        return 0; /* not "retL" */
-
-    /* List IP addresses */
-    banout_append(banout, PROTO_UDP_ZEROACCESS, "ZeroAccess:", 11);
-
-    {
-        unsigned i;
-        unsigned ip_count = buf[12] | buf[13]<<8 | buf[14]<<16 | buf[15]<<24;
-        if (ip_count > 256)
-            return 0; /* too many addresses */
-        if (16 + ip_count*8 > len)
-            return 0; /* packet overflow */
-        for (i=0; i<ip_count; i++) {
-            unsigned ip_found;
-            char szaddr[20];
-
-            ip_found =  buf[16 + i*8 + 0] <<24
-                      | buf[16 + i*8 + 1] <<16
-                      | buf[16 + i*8 + 2] << 8
-                      | buf[16 + i*8 + 3] << 0;
-
-            snprintf(szaddr, sizeof(szaddr), "%u.%u.%u.%u ",
-                    (unsigned char)(ip_found>>24),
-                    (unsigned char)(ip_found>>16),
-                    (unsigned char)(ip_found>> 8),
-                    (unsigned char)(ip_found>> 0)
-                    );
-            banout_append(banout, PROTO_UDP_ZEROACCESS, szaddr, strlen(szaddr));
-        }
-    }
-
-
-
-
-
-    output_report_banner(
-            out, timestamp,
-            ip_them, 17, port_them,
-            PROTO_UDP_ZEROACCESS,
-            parsed->ip_ttl,
-            banout_string(banout, PROTO_UDP_ZEROACCESS),
-            banout_string_length(banout, PROTO_UDP_ZEROACCESS));
-
-    return 0; /* is zeroaccess botnet*/
-}
-
-/***************************************************************************
- ***************************************************************************/
-static const unsigned char sample[] = {
-    0xda, 0xbe, 0x6e, 0xce,
-    0x28, 0x94, 0x8d, 0xab,
-    0xc9, 0xc0, 0xd1, 0x99,
-    0xec, 0xd6, 0xa9, 0x3c
-};
-
-
-/***************************************************************************
- ***************************************************************************/
-int
-zeroaccess_selftest(void)
-{
-    unsigned char buf[128];
+  /* Validate the CRC */
+  {
     unsigned old_crc;
     unsigned new_crc;
 
-    zadecrypt(sample, sizeof(sample), buf, sizeof(buf));
-
-    old_crc = buf[0] | buf[1]<<8 | buf[2]<<16 | buf[3]<<24;
-
-
+    old_crc = buf[0] | buf[1] << 8 | buf[2] << 16 | buf[3] << 24;
     memset(buf, 0, 4);
-
-    new_crc = crc_calc(buf, sizeof(sample));
-
-    generate_getL(buf, sizeof(buf), 0x7f570a0f);
-
-    if (memcmp(buf, sample, 16) != 0)
-        return 1; /*fail*/
+    new_crc = crc_calc(buf, len);
     if (old_crc != new_crc)
-        return 1; /*fail*/
+      return 0; /* not zeroaccess, or corrupted */
+  }
 
-    /*generate_getL(buf, sizeof(buf), *(unsigned*)"mass");
-    {
-        unsigned i;
-        for (i=0; i<16; i++)
-            printf("0x%02x, ", buf[i]);
-    }*/
+  /* Make sure this is a "retl" packet */
+  if (len < 16 || memcmp(buf + 4, "Lter", 4) != 0)
+    return 0; /* not "retL" */
 
-    return 0; /*success*/
+  /* List IP addresses */
+  banout_append(banout, PROTO_UDP_ZEROACCESS, "ZeroAccess:", 11);
+
+  {
+    unsigned i;
+    unsigned ip_count = buf[12] | buf[13] << 8 | buf[14] << 16 | buf[15] << 24;
+    if (ip_count > 256)
+      return 0; /* too many addresses */
+    if (16 + ip_count * 8 > len)
+      return 0; /* packet overflow */
+    for (i = 0; i < ip_count; i++) {
+      unsigned ip_found;
+      char szaddr[20];
+
+      ip_found = buf[16 + i * 8 + 0] << 24 | buf[16 + i * 8 + 1] << 16 |
+                 buf[16 + i * 8 + 2] << 8 | buf[16 + i * 8 + 3] << 0;
+
+      snprintf(szaddr, sizeof(szaddr), "%u.%u.%u.%u ",
+               (unsigned char)(ip_found >> 24), (unsigned char)(ip_found >> 16),
+               (unsigned char)(ip_found >> 8), (unsigned char)(ip_found >> 0));
+      banout_append(banout, PROTO_UDP_ZEROACCESS, szaddr, strlen(szaddr));
+    }
+  }
+
+  output_report_banner(out, timestamp, ip_them, 17, port_them,
+                       PROTO_UDP_ZEROACCESS, parsed->ip_ttl,
+                       banout_string(banout, PROTO_UDP_ZEROACCESS),
+                       banout_string_length(banout, PROTO_UDP_ZEROACCESS));
+
+  return 0; /* is zeroaccess botnet*/
 }
 
+/***************************************************************************
+ ***************************************************************************/
+static const unsigned char sample[] = {0xda, 0xbe, 0x6e, 0xce, 0x28, 0x94,
+                                       0x8d, 0xab, 0xc9, 0xc0, 0xd1, 0x99,
+                                       0xec, 0xd6, 0xa9, 0x3c};
 
+/***************************************************************************
+ ***************************************************************************/
+int zeroaccess_selftest(void) {
+  unsigned char buf[128];
+  unsigned old_crc;
+  unsigned new_crc;
+
+  zadecrypt(sample, sizeof(sample), buf, sizeof(buf));
+
+  old_crc = buf[0] | buf[1] << 8 | buf[2] << 16 | buf[3] << 24;
+
+  memset(buf, 0, 4);
+
+  new_crc = crc_calc(buf, sizeof(sample));
+
+  generate_getL(buf, sizeof(buf), 0x7f570a0f);
+
+  if (memcmp(buf, sample, 16) != 0)
+    return 1; /*fail*/
+  if (old_crc != new_crc)
+    return 1; /*fail*/
+
+  /*generate_getL(buf, sizeof(buf), *(unsigned*)"mass");
+  {
+      unsigned i;
+      for (i=0; i<16; i++)
+          printf("0x%02x, ", buf[i]);
+  }*/
+
+  return 0; /*success*/
+}

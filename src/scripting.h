@@ -20,4 +20,3 @@ void scripting_init(struct Masscan *masscan);
 void scripting_masscan_init(struct Masscan *masscan);
 
 #endif
-

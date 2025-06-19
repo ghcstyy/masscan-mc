@@ -1,8 +1,9 @@
 #ifndef TCP_PACKET_H
 #define TCP_PACKET_H
-#include <stdio.h>
-#include <stdint.h>
 #include "massip-addr.h"
+#include <stdint.h>
+#include <stdio.h>
+
 struct PayloadsUDP;
 struct MassVulnCheck;
 struct TemplateOptions;
@@ -16,28 +17,27 @@ struct TemplateOptions;
 int template_selftest(void);
 
 enum TemplateProtocol {
-    Proto_TCP,
-    Proto_UDP,
-    Proto_SCTP,
-    Proto_ICMP_ping,
-    Proto_ICMP_timestamp,
-    Proto_ARP,
-    Proto_Oproto,
-    Proto_VulnCheck,
-    //Proto_IP,
-    //Proto_Custom,
-    Proto_Count
+  Proto_TCP,
+  Proto_UDP,
+  Proto_SCTP,
+  Proto_ICMP_ping,
+  Proto_ICMP_timestamp,
+  Proto_ARP,
+  Proto_Oproto,
+  Proto_VulnCheck,
+  // Proto_IP,
+  // Proto_Custom,
+  Proto_Count
 };
 
 struct TemplatePayload {
-    unsigned length;
-    unsigned checksum;
-    unsigned char buf[1500];
+  unsigned length;
+  unsigned checksum;
+  unsigned char buf[1500];
 };
 
-unsigned
-udp_checksum2(const unsigned char *px, unsigned offset_ip,
-              unsigned offset_tcp, size_t tcp_length);
+unsigned udp_checksum2(const unsigned char *px, unsigned offset_ip,
+                       unsigned offset_tcp, size_t tcp_length);
 
 /**
  * Describes a packet template. The scan packets we transmit are based on a
@@ -45,28 +45,28 @@ udp_checksum2(const unsigned char *px, unsigned offset_ip,
  * bits, like the destination IP address and port
  */
 struct TemplatePacket {
-    struct {
-        unsigned length;
-        unsigned offset_ip;
-        unsigned offset_tcp;
-        unsigned offset_app;
-        unsigned char *packet;
-        unsigned checksum_ip;
-        unsigned checksum_tcp;
-        unsigned ip_id;
-    } ipv4;
-    struct {
-        unsigned length;
-        unsigned offset_ip;
-        unsigned offset_tcp;
-        unsigned offset_app;
-        unsigned char *packet;
-        unsigned checksum_ip;
-        unsigned checksum_tcp;
-        unsigned ip_id;
-    } ipv6;
-    enum TemplateProtocol proto;
-    struct PayloadsUDP *payloads;
+  struct {
+    unsigned length;
+    unsigned offset_ip;
+    unsigned offset_tcp;
+    unsigned offset_app;
+    unsigned char *packet;
+    unsigned checksum_ip;
+    unsigned checksum_tcp;
+    unsigned ip_id;
+  } ipv4;
+  struct {
+    unsigned length;
+    unsigned offset_ip;
+    unsigned offset_tcp;
+    unsigned offset_app;
+    unsigned char *packet;
+    unsigned checksum_ip;
+    unsigned checksum_tcp;
+    unsigned ip_id;
+  } ipv6;
+  enum TemplateProtocol proto;
+  struct PayloadsUDP *payloads;
 };
 
 /**
@@ -74,17 +74,14 @@ struct TemplatePacket {
  * time. Therefore, instead of one packet prototype for all scans, we have
  * a set of prototypes/templates.
  */
-struct TemplateSet
-{
-    unsigned count;
-    struct MassVulnCheck *vulncheck;
-    uint64_t entropy;
-    struct TemplatePacket pkts[Proto_Count];
+struct TemplateSet {
+  unsigned count;
+  struct MassVulnCheck *vulncheck;
+  uint64_t entropy;
+  struct TemplatePacket pkts[Proto_Count];
 };
 
 struct TemplateSet templ_copy(const struct TemplateSet *templ);
-
-
 
 /**
  * Initialize the "template" packets. As we spew out probes, we simply make
@@ -109,17 +106,13 @@ struct TemplateSet templ_copy(const struct TemplateSet *templ);
  *       1 = Ethernet
  *      12 = Raw IP (no data link)
  */
-void
-template_packet_init(
-    struct TemplateSet *templset,
-    macaddress_t source_mac,
-    macaddress_t router_mac_ipv4,
-    macaddress_t router_mac_ipv6,
-    struct PayloadsUDP *udp_payloads,
-    struct PayloadsUDP *oproto_payloads,
-    int data_link,
-    uint64_t entropy,
-    const struct TemplateOptions *templ_opts);
+void template_packet_init(struct TemplateSet *templset, macaddress_t source_mac,
+                          macaddress_t router_mac_ipv4,
+                          macaddress_t router_mac_ipv6,
+                          struct PayloadsUDP *udp_payloads,
+                          struct PayloadsUDP *oproto_payloads, int data_link,
+                          uint64_t entropy,
+                          const struct TemplateOptions *templ_opts);
 
 /**
  * Sets the target/destination IP address of the packet, the destination port
@@ -150,45 +143,34 @@ template_packet_init(
  *      different manner. For example, if the UDP port is 161, then
  *      this will be the transaction ID of the SNMP request template.
  */
-void
-template_set_target_ipv4(
-    struct TemplateSet *templset,
-    ipv4address ip_them, unsigned port_them,
-    ipv4address ip_me, unsigned port_me,
-    unsigned seqno,
-    unsigned char *px, size_t sizeof_px, size_t *r_length);
+void template_set_target_ipv4(struct TemplateSet *templset, ipv4address ip_them,
+                              unsigned port_them, ipv4address ip_me,
+                              unsigned port_me, unsigned seqno,
+                              unsigned char *px, size_t sizeof_px,
+                              size_t *r_length);
 
-void
-template_set_target_ipv6(
-    struct TemplateSet *templset,
-    ipv6address ip_them, unsigned port_them,
-    ipv6address ip_me, unsigned port_me,
-    unsigned seqno,
-    unsigned char *px, size_t sizeof_px, size_t *r_length);
-
+void template_set_target_ipv6(struct TemplateSet *templset, ipv6address ip_them,
+                              unsigned port_them, ipv6address ip_me,
+                              unsigned port_me, unsigned seqno,
+                              unsigned char *px, size_t sizeof_px,
+                              size_t *r_length);
 
 /**
  * Create a TCP packet containing a payload, based on the original
  * template used for the SYN
  */
-size_t
-tcp_create_packet(
-        struct TemplatePacket *pkt,
-        ipaddress ip_them, unsigned port_them,
-        ipaddress ip_me, unsigned port_me,
-        unsigned seqno, unsigned ackno,
-        unsigned flags,
-        const unsigned char *payload, size_t payload_length,
-        unsigned char *px, size_t px_length);
+size_t tcp_create_packet(struct TemplatePacket *pkt, ipaddress ip_them,
+                         unsigned port_them, ipaddress ip_me, unsigned port_me,
+                         unsigned seqno, unsigned ackno, unsigned flags,
+                         const unsigned char *payload, size_t payload_length,
+                         unsigned char *px, size_t px_length);
 
 /**
  * Set's the TCP "window" field. The purpose is to cause the recipient
  * to fragment data on the response, thus evading IDS that triggers on
  * out going packets
  */
-void
-tcp_set_window(unsigned char *px, size_t px_length, unsigned window);
-
+void tcp_set_window(unsigned char *px, size_t px_length, unsigned window);
 
 void template_set_ttl(struct TemplateSet *tmplset, unsigned ttl);
 void template_set_vlan(struct TemplateSet *tmplset, unsigned vlan);

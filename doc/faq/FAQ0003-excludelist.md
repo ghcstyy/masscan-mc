@@ -22,4 +22,3 @@ people who have something to hide.
 
 Fourthly, and most importantly, it's Wrong Think on how to manage your
 network.
-

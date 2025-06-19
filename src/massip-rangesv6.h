@@ -6,36 +6,35 @@
 #ifndef RANGES6_H
 #define RANGES6_H
 #include "massip-addr.h"
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
+
 struct Range;
 
 /**
  * A range of IPv6 ranges.
  * Inclusive, so [n..m] includes both 'n' and 'm'.
  */
-struct Range6
-{
-    ipv6address begin;
-    ipv6address end; 
+struct Range6 {
+  ipv6address begin;
+  ipv6address end;
 };
 
 /**
  * An array of ranges in sorted order
  */
-struct Range6List
-{
-    struct Range6 *list;
-    size_t count;
-    size_t max;
-    size_t *picker;
-    unsigned is_sorted:1;
+struct Range6List {
+  struct Range6 *list;
+  size_t count;
+  size_t max;
+  size_t *picker;
+  unsigned is_sorted : 1;
 };
 
 /**
  * Adds the given range to the targets list. The given range can be a duplicate
  * or overlap with an existing range, which will get combined with existing
- * ranges. 
+ * ranges.
  * @param targets
  *      A list of IPv6 ranges.
  * @param begin
@@ -43,9 +42,8 @@ struct Range6List
  * @param end
  *      The last address (inclusive) of the range that'll be added.
  */
-void
-range6list_add_range(struct Range6List *targets, ipv6address begin, ipv6address end);
-
+void range6list_add_range(struct Range6List *targets, ipv6address begin,
+                          ipv6address end);
 
 /**
  * Removes the given range from the target list. The input range doesn't
@@ -57,15 +55,14 @@ range6list_add_range(struct Range6List *targets, ipv6address begin, ipv6address 
  * @param end
  *      The last address of the range that'll be removed (inclusive).
  */
-void
-range6list_remove_range(struct Range6List *targets, const ipv6address begin, const ipv6address end);
+void range6list_remove_range(struct Range6List *targets,
+                             const ipv6address begin, const ipv6address end);
 
 /**
  * Same as 'rangelist_remove_range()', except the input is a range
  * structure instead of a start/stop numbers.
  */
-void
-range6list_remove_range2(struct Range6List *targets, struct Range6 range);
+void range6list_remove_range2(struct Range6List *targets, struct Range6 range);
 
 /**
  * Returns 'true' if the indicated IPv6 address is in one of the target
@@ -74,12 +71,11 @@ range6list_remove_range2(struct Range6List *targets, struct Range6 range);
  *      A list of IPv6 ranges
  * @param ip
  *      An IPv6 address that might in be in the list of ranges
- * @return 
+ * @return
  *      'true' if the ranges contain the item, or 'false' otherwise
  */
-int
-range6list_is_contains(const struct Range6List *targets, const ipv6address ip);
-
+int range6list_is_contains(const struct Range6List *targets,
+                           const ipv6address ip);
 
 /**
  * Tests if the range is bad/invalid.
@@ -101,10 +97,8 @@ int range6_is_bad_address(const struct Range6 *range);
  * @return
  *      the total number of IP addresses or ports removed.
  */
-ipv6address
-range6list_exclude( struct Range6List *targets,
-                    const struct Range6List *excludes);
-
+ipv6address range6list_exclude(struct Range6List *targets,
+                               const struct Range6List *excludes);
 
 /**
  * Counts the total number of IPv6 addresses in the target list. This
@@ -115,8 +109,7 @@ range6list_exclude( struct Range6List *targets,
  * @return
  *      The total number of address or ports.
  */
-massint128_t
-range6list_count(const struct Range6List *targets);
+massint128_t range6list_count(const struct Range6List *targets);
 
 /**
  * Given an index in a continuous range of [0...count], pick a corresponding
@@ -141,48 +134,38 @@ range6list_count(const struct Range6List *targets);
  * @return
  *      an IP address or port corresponding to this index.
  */
-ipv6address
-range6list_pick(const struct Range6List *targets, uint64_t index);
-
-
+ipv6address range6list_pick(const struct Range6List *targets, uint64_t index);
 
 /**
  * Remove all the ranges in the range list.
  */
-void
-range6list_remove_all(struct Range6List *list);
+void range6list_remove_all(struct Range6List *list);
 
 /**
  * Merge two range lists
  */
-void
-range6list_merge(struct Range6List *list1, const struct Range6List *list2);
-
+void range6list_merge(struct Range6List *list1, const struct Range6List *list2);
 
 /**
  * Optimizes the target list, so that when we call "rangelist_pick()"
- * from an index, it runs faster. It currently configures this for 
+ * from an index, it runs faster. It currently configures this for
  * a binary-search, though in the future some more efficient
  * algorithm may be chosen.
  */
-void
-range6list_optimize(struct Range6List *targets);
+void range6list_optimize(struct Range6List *targets);
 
 /**
  * Sorts the list of target. We maintain the list of targets in sorted
  * order internally even though we scan the targets in random order
  * externally.
  */
-void
-range6list_sort(struct Range6List *targets);
+void range6list_sort(struct Range6List *targets);
 
 /**
  * Does a regression test of this module
  * @return
  *      0 if the regression test succeeds, or a positive value on failure
  */
-int
-ranges6_selftest(void);
-
+int ranges6_selftest(void);
 
 #endif

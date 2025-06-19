@@ -15,7 +15,7 @@ extern const char *ssl_hello_sslv3_template;
 unsigned ssl_hello_size(const void *templ);
 
 /**
- * Allocate memory and make a copy of the template, so that we can 
+ * Allocate memory and make a copy of the template, so that we can
  * rewrite some fields, such as setting the correct timestamp
  */
 char *ssl_hello(const void *templ);
@@ -27,6 +27,5 @@ char *ssl_hello(const void *templ);
  * the template.
  */
 char *ssl_add_cipherspec(void *templ, unsigned cipher_spec, unsigned is_append);
-
 
 #endif
