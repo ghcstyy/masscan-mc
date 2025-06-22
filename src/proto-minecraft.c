@@ -15,6 +15,12 @@ static unsigned char status_request[2] = {0x01, 0x00};
 static unsigned char ping_request[10] = {0x09, 0x01, 0xF0, 0x0D, 0xBA,
                                          0xD0, 0x00, 0x00, 0x00, 0x00};
 
+int string_compare(const char* json, jsmntok_t* tok, const char* s)
+{
+    return (tok->type == JSMN_STRING && (int) strlen(s) == tok->end - tok->start &&
+            strncmp(json + tok->start, s, tok->end - tok->start) == 0);
+}
+
 int read_varint(const unsigned char* data, int* value, int* bytes_read)
 {
     int result = 0;
@@ -86,15 +92,23 @@ static void minecraft_parse(const struct Banner1* banner1, void* banner1_private
         int token_count = jsmn_parse(&p, json, json_size, tokens,
                                      128);  // "s" is the char array holding the json content
 
-        for (size_t i = 0; i < token_count; i++)
+        for (size_t i = 1; i < token_count; i + 2)
         {
             jsmntok_t token = tokens[i];
 
+            if (token.type != 4)
+                continue;
+
+            jsmntok_t value = tokens[i + 1];
+
+            if (string_compare(json, &token, "version"))
+            {
+                char* v = malloc(sizeof(value.end - value.start));
+                memcpy(v, json + value.start, value.end - value.start);
+                pstate->sub.minecraft.version_name = v;
+            }
             if (token.type == 4)
             {
-                i++;
-                jsmntok_t value = tokens[i];
-
                 switch (value.type)
                 {
                     case 1:

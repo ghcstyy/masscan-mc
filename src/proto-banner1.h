@@ -142,6 +142,15 @@ struct MCSTUFF
     int brackcount;
 };
 
+struct MINECRAFTSTUFF
+{
+    char* version_name;
+    int version_id;
+    char* description;
+    int max_players;
+    int players_online;
+};
+
 struct SMTPSTUFF
 {
     unsigned code;
@@ -285,6 +294,7 @@ struct StreamState
         struct SMBSTUFF smb;
         struct RDPSTUFF rdp;
         struct MCSTUFF mc;
+        struct MINECRAFTSTUFF minecraft;
         struct SSHSTUFF ssh;
     } sub;
 };
