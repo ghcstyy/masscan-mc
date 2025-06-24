@@ -15,6 +15,17 @@ static unsigned char status_request[2] = {0x01, 0x00};
 static unsigned char ping_request[10] = {0x09, 0x01, 0xF0, 0x0D, 0xBA,
                                          0xD0, 0x00, 0x00, 0x00, 0x00};
 
+int str2int(char* s, int length)
+{
+    int out = 0;
+    for (int i = 0; i < length; i++)
+    {
+        out = out * 10 + (s[i] - '0');
+    }
+
+    return out;
+}
+
 int string_compare(const char* json, jsmntok_t* tok, const char* s)
 {
     return (tok->type == JSMN_STRING && (int) strlen(s) == tok->end - tok->start &&

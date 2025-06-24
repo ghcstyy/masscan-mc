@@ -47,8 +47,9 @@ endif
 # my regularly regression-test environment. That means at any point
 # in time, something might be minorly broken in Mac OS X.
 ifneq (, $(findstring darwin, $(SYS)))
+CC = gcc-15
 LIBS = -lm 
-INCLUDES = -I.
+INCLUDES = -I. -include stddef.h #TODO: Remove this ugly hack to make it comile on macOS, did this because the header is missing inside of files but is implicitly included in windows
 FLAGS2 = 
 INSTALL_DATA = -pm755
 endif
